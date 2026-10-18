@@ -386,6 +386,10 @@ export function presetRewrite(text: string, language: InputLanguage = 'auto', st
       if (actualLanguage === 'ja' && source === '加えて、' && !sentenceStart(text, start)) continue;
       if (actualLanguage === 'en' && /[-_'’]/.test((text[start - 1] ?? '') + (text[end] ?? ''))) continue;
       if (actualLanguage === 'en' && /^hard to\b/i.test(source) && /^difficult to\b/i.test(target) && !hasAdjectivalHardFrame(text, start)) continue;
+      // "separately from" expresses a separation relation; "individually"
+      // cannot take that same complement. Check each occurrence, leaving
+      // standalone uses and the reverse dictionary direction eligible.
+      if (actualLanguage === 'en' && source === 'separately' && target === 'individually' && /^\s+from(?![\p{L}\p{M}\p{N}_'’])/iu.test(text.slice(end))) continue;
       // A compound-capable kanji noun cannot safely become a verbal/noun phrase
       // inside another kanji compound (e.g. 作業 + 手順 -> 作業 + 進め方).
       // した may be past する or the start of a desire form (したがる,

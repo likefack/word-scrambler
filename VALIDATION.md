@@ -1,11 +1,12 @@
-# r32 export validation
+# r33 export validation
 
-Application source commit: `c2ef4bb36cfd3277a4657b4d548a18d64be0de9c`.
-Application version: `2026.10.18-r32`.
+Application source commit: `284afac317bbb652f95c93eb45c88e5be2f2e75c`.
+Application version: `2026.10.18-r33`.
 Date: 2026-10-18.
 
 ## Completed checks
 
+- The r33 separately/from-complement regression suite passed all 9 tests in a temporary Node-native TypeScript harness. It covers case/whitespace, occurrence-specific complements, standalone and reverse directions, word boundaries and quoted protection. The supplied implementation and test files remain byte-identical to the verified four-file patch; only the temporary compiler/import adapter differed. Full application tests, typechecking and build were not rerun here.
 - The r32 explicit-title regression suite passed all 16 tests in a temporary Node-native TypeScript harness. It checks title assignments, ordinary title discussion, neighboring sentences, style evidence, quote behavior, UTF-16 offsets and unchanged dictionary counts. The supplied implementation and test files remain byte-identical to the verified four-file patch; only the temporary compiler/import adapter differed. Full application tests, typechecking and build were not rerun here.
 - Separate production r31 validation passed 426 tests and synthetic live-UI checks. These reported production results are distinct from local source-publication checks.
 - Local r31 dictionary/context and data-license checks passed 25 tests in a temporary Node-native TypeScript harness; one renderer-dependent license-page test was explicitly skipped. All 21 packet files match their before/after SHA256 values, and all 12 local notice links exist. The same three data modules remain CC BY-SA 4.0; software helpers remain MIT. Original upstream notice contacts, whitespace and heading separators are retained. The suite confirms 12,639 style-specific entries. Full application tests, typechecking and build were not rerun here.
@@ -19,7 +20,7 @@ Date: 2026-10-18.
 - The r23 application checkout and its portable sync each passed 289 automated tests and TypeScript checking. The application passed the five-stage Vinext build. The r24 receipt-display follow-up passed 37 client tests, 43 independent checks, TypeScript checking and the same build; the only new behavior preserves a confirmed receipt when a sending choice is subsequently disabled.
 - An independent fixed r23 copy passed 62 checks, including real local Workerd/D1 and additional cancellation, delayed-success, key-contamination and one-send UI event tests. The execution/storage boundary hashes matched the release.
 - r22's conservative English dictionary safety fix passed 41 independent checks. Production dictionary examples confirmed that effort-adverb hard and think about are preserved while a supported adjectival hard phrase can be replaced.
-- The r32 source sync is applied against the verified public r31 baseline. Source-version metadata and public documentation are aligned without copying deployment settings or data. Existing license/data boundaries and original upstream notices are unchanged. Earlier production validation is separate from these local publication checks.
+- The r33 source sync is applied against the verified public r32 baseline. Source-version metadata and public documentation are aligned without copying deployment settings or data. Existing license/data boundaries and original upstream notices are unchanged. Earlier production validation is separate from these local publication checks.
 - Tests include anonymous admission, shared request limits, separate text-report tables, execution-time selection, secret rejection, model-output validation and browser event-handler fixtures. Provider network requests are mocked or blocked.
 - Live r23 browser and database verification confirmed one authorized synthetic source/result record with notice .5 and selection flag 1. The previous browser OFF settings were restored. No real Groq key is used in this export validation; the r24 follow-up publication is verified separately.
 - The export excludes credentials, database records, private corpora, live Site identifiers and local runtime configuration. Previously published guide PNG assets and their C2PA provenance are unchanged.
