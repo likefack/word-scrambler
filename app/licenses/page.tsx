@@ -17,6 +17,10 @@ export default function Licenses(){return <main className="legal-document">
     </ul>
     <p>wordfreqの出典にはGoogle Books Ngrams、Leeds Internet Corpus、Wikipedia、ParaCrawl、OpenSubtitles、Marc BrysbaertほかによるSUBTLEXが含まれます。SUBTLEXは無償で利用できるデータです。元の帰属表示は上記リンクに収録しています。</p>
   </section>
+  <section><h2>用例の確認に参照した資料</h2>
+    <p>Universal Dependencies r2.18 の <External href="https://github.com/UniversalDependencies/UD_English-EWT/tree/r2.18">English EWT</External> と <External href="https://github.com/UniversalDependencies/UD_Japanese-GSD/tree/r2.18">Japanese GSD</External> を参照しています。収録文をアプリの辞書に転載していません。</p>
+    <p>EWT：<a href="/licenses/UD-en-README.md">帰属表示</a>／<a href="/licenses/UD-en-LICENSE.txt">利用条件</a> · GSD：<a href="/licenses/UD-ja-README.md">帰属表示</a>／<a href="/licenses/UD-ja-LICENSE.txt">利用条件</a></p>
+  </section>
   <section><h2>辞書整備に利用したツール</h2>
     <p>SudachiPy・SudachiDictのライセンス：<a href="/licenses/SudachiPy-LICENSE.txt">Apache 2.0</a>／<a href="/licenses/SudachiDict-LEGAL.txt">辞書の権利表示</a></p>
   </section>

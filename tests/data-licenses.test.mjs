@@ -20,7 +20,7 @@ test('license page retains all local notices, isolated external links and a nati
  const result=await build({entryPoints:[join(root,'app/licenses/page.tsx')],bundle:true,format:'esm',platform:'node',jsx:'automatic',write:false,external:['react','react/jsx-runtime'],loader:{'.css':'empty'}});
  const file=join(temp,'licenses.mjs');writeFileSync(file,result.outputFiles[0].text.replaceAll('from "react/jsx-runtime"',`from ${JSON.stringify(join(root,'node_modules/react/jsx-runtime.js'))}`));
  const html=renderToStaticMarkup((await import(pathToFileURL(file))).default());
- for(const phrase of ['MIT','CC BY-SA 4.0','入力文や変換結果','Princeton','Robyn Speer','NICT','作成者：自我巨大児'])assert(html.includes(phrase),phrase);
+ for(const phrase of ['MIT','CC BY-SA 4.0','入力文や変換結果','Princeton','Robyn Speer','NICT','作成者：自我巨大児','Universal Dependencies r2.18','収録文をアプリの辞書に転載していません'])assert(html.includes(phrase),phrase);
  assert(html.includes('<a href="/">'));assert(!html.includes('<form'));assert(!html.includes('dangerouslySetInnerHTML'));
  for(const match of html.matchAll(/<a ([^>]+)>/g)){
   const attrs=match[1],href=attrs.match(/href="([^"]+)"/)[1];
@@ -38,5 +38,9 @@ test('upstream copyright and permission notices are distributed without removal'
  ['SudachiPy-LICENSE.txt',['Apache','2.0']],
  ['SudachiDict-LEGAL.txt',['Copyright']],
  ['MIT-LICENSE.txt',['Copyright (c) 2026 codeswitcher','Permission is hereby granted']],
+ ['UD-en-LICENSE.txt',['Creative Commons']],
+ ['UD-en-README.md',['Universal Dependencies']],
+ ['UD-ja-LICENSE.txt',['Creative Commons']],
+ ['UD-ja-README.md',['Universal Dependencies']],
  ]){const source=readFileSync('public/licenses/'+file,'utf8');for(const term of terms)assert(source.includes(term),file+': '+term);}
 });

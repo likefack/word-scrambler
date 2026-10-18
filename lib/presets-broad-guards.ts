@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
+import{allowsNewJapaneseLiteralContext}from'./presets-ja-literal-guard';
+import{allowsJapaneseFrequentContext}from'./presets-ja-frequency-guard';
+import{allowsFrequentAdverb}from'./presets-en-frequency-guard';
 /** Conservative source-only scope for reviewed ordinary noun directions. Not a sense/POS parser. */
-export type BroadGuard = 'none' | 'ja-standalone' | 'ja-nominal-tail' | 'ja-suru-tail' | 'ja-complete-entry' | 'en-sofa-compound';
+export type BroadGuard = 'none' | 'ja-standalone' | 'ja-nominal-tail' | 'ja-suru-tail' | 'ja-complete-entry' | 'en-sofa-compound' | 'en-adverb-context' | 'ja-frequency-context' | "ja-standalone-v13" | "ja-frequency-context-v13";
 const compoundCharacter = /[\p{Script=Han}\p{Script=Katakana}\p{Script=Latin}\p{Script=Greek}\p{Script=Cyrillic}\p{N}ー々〆ヵヶ]/u;
 const endOrPunctuation = /^[\s、。，．！？!?;；:：)）\]】}」』“”‘’"'…]/u;
 const nominalTail = /^(?:が|は|を|に|へ|と|の|も|や|か|で|だ|じゃ|から|まで|より|ほど|だけ|ばかり|さえ|すら|など|なんて|なら|って|たち)/u;
@@ -11,7 +14,11 @@ function clauseAround(text:string,start:number,end:number):string {
  const right=text.slice(end).split(/[。！？!?\n]/u)[0]??'';
  return left+text.slice(start,end)+right;
 }
-export function allowsBroadMatch(text:string,start:number,end:number,guard:BroadGuard):boolean {
+const newLiteralGuards:Partial<Record<BroadGuard,BroadGuard>> = {"ja-standalone-v13":"ja-standalone","ja-frequency-context-v13":"ja-frequency-context"};
+export function allowsBroadMatch(text:string,start:number,end:number,guard:BroadGuard,style:'business'|'academic'|'casual'='business',target?:string):boolean {
+ if (guard==='en-adverb-context')return allowsFrequentAdverb(text,start,end,style);
+ if (guard==='ja-frequency-context')return allowsJapaneseFrequentContext(text,start,end,style);
+ const literalBase=newLiteralGuards[guard];if(literalBase)return allowsNewJapaneseLiteralContext(text,start,end,target)&&allowsBroadMatch(text,start,end,literalBase,style,target);
  if (guard==='none')return true;
  if (guard==='en-sofa-compound')return !/^\s+bed(?:s)?(?:\b|$)/iu.test(text.slice(end));
  const before=Array.from(text.slice(0,start)).at(-1)??'',after=text.slice(end),next=Array.from(after)[0]??'';

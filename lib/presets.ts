@@ -371,7 +371,7 @@ export function presetRewrite(text: string, language: InputLanguage = 'auto', st
       const start = match.index!, original = match[0], end = start + original.length;
       if (!boundaries.has(start) || !boundaries.has(end) || overlaps({ start, end }, immutable)) continue;
       const broadScope = BROAD_SCOPES[[actualLanguage,selected,source,target].join('\0')];
-      if (broadScope && !allowsBroadMatch(text,start,end,broadScope)) continue;
+      if (broadScope && !allowsBroadMatch(text,start,end,broadScope,selected,target)) continue;
       // Partial lexical substitutions must not strand honorific お/ご prefixes.
       if (actualLanguage === 'ja' && /^[\p{Script=Han}]/u.test(original) && /[おご]/.test(text[start-1]??'')) continue;
       // The connective 加えて is safe here only at a sentence boundary. In

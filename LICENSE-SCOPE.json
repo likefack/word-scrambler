@@ -7,7 +7,10 @@
   ],
   "softwareLicense": "MIT",
   "newSoftwareFiles": [
-    "lib/presets-broad-guards.ts"
+    "lib/presets-broad-guards.ts",
+    "lib/presets-en-frequency-guard.ts",
+    "lib/presets-ja-frequency-guard.ts",
+    "lib/presets-ja-literal-guard.ts"
   ],
   "integrationFile": "lib/presets.ts",
   "wordfreqFrequencyValuesBundled": false,

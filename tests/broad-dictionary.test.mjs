@@ -24,10 +24,10 @@ test('new tables are append-only with explicit Japanese scope and deterministic 
   for(const [source,target]of (language==='ja'?JA_BROAD:EN_BROAD)[style]){
    assert(source&&target&&source!==target);
    assert(pairs.some(p=>p[0]===source));
-   if(language==='ja')assert.equal(BROAD_SCOPES[[language,style,source,target].join('\0')],'ja-complete-entry');
+   if(language==='ja')assert(['ja-complete-entry','ja-standalone-v13','ja-frequency-context-v13'].includes(BROAD_SCOPES[[language,style,source,target].join('\0')]));
   }
  }
- assert.equal(total,12484);
+ assert.equal(total,12639);
  assert.equal(STYLE_DICTIONARIES.en.business.find(p=>p[0]==='postpone')[1],'delay');
  assert.equal(STYLE_DICTIONARIES.en.casual.find(p=>p[0]==='wonderful')[1],'great');
 });

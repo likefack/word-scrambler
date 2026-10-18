@@ -8,7 +8,7 @@ import { applyModelOutput, RewriteError, validateInput, detectLanguage, words, t
 import { isGroqApiKey } from '../../../lib/server-groq';
 import { admitPublicApi, publicJsonRequestError, type PublicApiAdmission } from '../../../lib/public-api-admission';
 export const dynamic = 'force-dynamic';
-const APP_VERSION = '2026.10.18-r30';
+const APP_VERSION = '2026.10.18-r31';
 type Stage = 'origin'|'request_body'|'input_validation'|'key_selection'|'admission'|'provider_fetch'|'provider_status'|'provider_body'|'provider_content'|'output_validation'|'complete';
 const json = (data: unknown, status=200, extraHeaders: Record<string,string>={}) => Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...extraHeaders}});
 async function boundedBody(request:Request){

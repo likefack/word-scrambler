@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
-// Dictionary data only; software wrappers retain MIT.
-// Attribution and upstream notices: DATA-LICENSE.md and public/licenses/.
-/** Reviewed WordNet/frequency-guided experimental data. Retain DATA-LICENSE and provenance. */
+// Selected dictionary data; retain DATA-LICENSE and upstream notices.
 export const EN_BROAD:Record<'business'|'academic'|'casual',readonly(readonly[string,string])[]> = {
   "business": [
     [
@@ -431,6 +429,30 @@ export const EN_BROAD:Record<'business'|'academic'|'casual',readonly(readonly[st
     [
       "extremely",
       "exceedingly"
+    ],
+    [
+      "also",
+      "additionally"
+    ],
+    [
+      "again",
+      "once more"
+    ],
+    [
+      "almost",
+      "nearly"
+    ],
+    [
+      "nearly",
+      "almost"
+    ],
+    [
+      "normally",
+      "usually"
+    ],
+    [
+      "similarly",
+      "likewise"
     ]
   ],
   "academic": [
@@ -873,6 +895,26 @@ export const EN_BROAD:Record<'business'|'academic'|'casual',readonly(readonly[st
     [
       "extremely",
       "exceedingly"
+    ],
+    [
+      "also",
+      "additionally"
+    ],
+    [
+      "again",
+      "once more"
+    ],
+    [
+      "almost",
+      "nearly"
+    ],
+    [
+      "nearly",
+      "almost"
+    ],
+    [
+      "normally",
+      "usually"
     ]
   ],
   "casual": [
@@ -1263,6 +1305,22 @@ export const EN_BROAD:Record<'business'|'academic'|'casual',readonly(readonly[st
     [
       "largely",
       "mostly"
+    ],
+    [
+      "again",
+      "once more"
+    ],
+    [
+      "almost",
+      "nearly"
+    ],
+    [
+      "nearly",
+      "almost"
+    ],
+    [
+      "similarly",
+      "likewise"
     ]
   ]
 };

@@ -6,7 +6,7 @@
 - ソースコード: https://github.com/likefack/word-scrambler
 - 作成者: 自我巨大児
 - Copyright (c) 2026 codeswitcher
-- このソースの機能版: 2026.10.18-r30
+- このソースの機能版: 2026.10.18-r31
 
 ## 機能
 
@@ -26,6 +26,8 @@ r26 では、条件表現・授受方向・連体修飾・文末述語・回数�
 r27 では、改行を含む半角ダブルクォートの引用も、辞書置換と文体判定から保護します。
 
 r29 では、日本語の願望表現の語尾を保護し、識別と理解の混同や `quiet`→`peaceful` の意味の変化につながる曖昧な辞書候補を外しています。
+
+r31 では、頻出する日英表現の候補を文脈条件付きで追加し、引用・文字列の記録、技術的用法、候補の併存などでは置換を控えます。
 
 ## 構成
 
@@ -107,3 +109,5 @@ npm run start
 The application software remains MIT. The new tables in `lib/presets-en-broad.ts`, `lib/presets-ja-broad.ts`, and `lib/presets-broad-scopes.ts` are separately licensed CC BY-SA 4.0. Keep their attribution, change description, and upstream notices when redistributing or adapting the data. This does not apply that data license to visitors' input or rewritten text. The new source-scope helper and merge logic remain MIT software.
 
 See [DATA-LICENSE.md](DATA-LICENSE.md), [LICENSE-SCOPE.json](LICENSE-SCOPE.json), and the bundled original notices under `public/licenses/`. The deployed app provides the same notices at `/licenses`. wordfreq was used offline for selection; no frequency values, rank table, corpus text, or runtime NLP package is bundled.
+
+The r31 follow-up keeps the same three CC BY-SA data modules; the new source-only context helpers remain MIT. Universal Dependencies r2.18 was consulted offline, with original notices retained under `public/licenses/`. No complete UD sentences or corpus files are shipped.
