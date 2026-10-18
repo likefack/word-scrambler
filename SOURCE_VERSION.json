@@ -1,6 +1,6 @@
 {
-  "app_version": "2026.10.18-r24",
-  "app_source_commit": "a78df255cc7f86880b7a717404aa581ae5d05094",
+  "app_version": "2026.10.18-r25",
+  "app_source_commit": "179d70a0fcbeda3a9ecd87591ac953a5f81d1710",
   "source_export_date": "2026-10-18",
   "portable_adaptations": [
     "package name and scripts",

@@ -137,7 +137,8 @@ const BASE_DICTIONARIES: Record<Language, Record<StyleId, readonly Pair[]>> = {
       ['complete the task', 'finish the task'],
       ['complete the project', 'finish the project'],
       ['start the meeting', 'begin the meeting'],
-      ['before the meeting', 'prior to the meeting'],
+      // Bare before/after + noun fragments can introduce finite clauses;
+      // do not convert their conjunction into a preposition without a parser.
       ['respond to your email', 'reply to your email'],
       ['thank you for your help', 'thank you for your assistance'],
       ['can help with', 'can assist with'],

@@ -148,8 +148,8 @@ export const EN_EXPANDED: Record<'business' | 'academic' | 'casual', readonly (r
     ['postpone the meeting', 'defer the meeting'],
     ['postponed the meeting', 'deferred the meeting'],
     ['during the meeting', 'in the course of the meeting'],
-    ['after the meeting', 'following the meeting'],
-    ['before the deadline', 'ahead of the deadline'],
+    // Omit ambiguous before/after + noun fragments: the noun may be a
+    // clause subject, including across modifiers or parenthetical phrases.
     ['ahead of schedule', 'earlier than scheduled'],
     ['behind schedule', 'later than scheduled'],
     ['at a convenient time', 'at a suitable time'],
