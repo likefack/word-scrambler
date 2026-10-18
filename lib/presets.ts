@@ -375,7 +375,18 @@ export function presetRewrite(text: string, language: InputLanguage = 'auto', st
       if (actualLanguage === 'en' && /^hard to\b/i.test(source) && /^difficult to\b/i.test(target) && !hasAdjectivalHardFrame(text, start)) continue;
       // A compound-capable kanji noun cannot safely become a verbal/noun phrase
       // inside another kanji compound (e.g. 作業 + 手順 -> 作業 + 進め方).
-      if (actualLanguage === 'ja' && original.endsWith('した') && /^(?:い|く|かっ|けれ)/.test(text.slice(end)) && !target.endsWith('した')) continue;
+      // した may be past する or the start of a desire form (したがる,
+      // したさ, したそう, etc.). Do not attach those tails to a nonsuru past.
+      // Past + contrastive が/けれど and causal から remain eligible.
+      if (actualLanguage === 'ja' && original.endsWith('した') && !target.endsWith('した')) {
+        const after = text.slice(end);
+        if (/^(?:い|く|かっ)/.test(after)) continue;
+        const desireTail = /^(?:かろう|ければ|けりゃ|が(?:る|ら|り|れ|ろう|っ)|さ|そう|げ)/.exec(after)?.[0];
+        // Do not confuse a prefix wholly inside a following noun (e.g. がれき)
+        // with an auxiliary. A boundary within the tail also counts: Segmenter
+        // may split が|ろうと rather than がろう|と.
+        if (desireTail && [...desireTail].some((_, index) => boundaries.has(end + index + 1))) continue;
+      }
       if (actualLanguage === 'ja' && /^[\p{Script=Han}]/u.test(original) && /[\p{Script=Han}]/u.test(text[start-1]??'') && /[\p{Script=Hiragana}]/u.test(target) && original.match(/^[\p{Script=Han}]+/u)?.[0]!==target.match(/^[\p{Script=Han}]+/u)?.[0]) continue;
       if (actualLanguage === 'ja' && /^[\p{Script=Han}]+$/u.test(original) && /[\p{Script=Hiragana}]/u.test(target) && /[\p{Script=Han}]/u.test((text[start-1]??'')+(text[end]??''))) continue;
       // A capitalized English phrase in the middle of a sentence may be a title/name.

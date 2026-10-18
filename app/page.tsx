@@ -26,7 +26,7 @@ const samples = {
   ]
 };
 type Diagnostic = {code:string;requestId:string;version:string;stage:string;httpStatus:number;upstreamStatus?:number;timestamp:string};
-const APP_VERSION='2026.10.18-r27';
+const APP_VERSION='2026.10.18-r29';
 function safeDiagnostic(raw:unknown,status:number,code:string,stage:string):Diagnostic {
   const data=raw&&typeof raw==='object'?raw as Record<string,unknown>:{};
   const safe=(value:unknown,pattern:RegExp,fallback:string)=>typeof value==='string'&&pattern.test(value)?value:fallback;
@@ -216,6 +216,6 @@ export default function Home(){
         </article>
       </div></details>
       <p className="privacy-links"><a href="/terms">利用規約</a>・<a href="/privacy">プライバシー説明</a>・<a href="/contact">お問い合わせ</a></p>
-    </main><footer><span>© 2026 codeswitcher</span><p>作成者：自我巨大児</p><span className="footer-language">JA / EN · 2026.10.18-r27</span><a href="https://github.com/likefack/word-scrambler" target="_blank" rel="noopener noreferrer">ソースコード（GitHub）</a></footer>
+    </main><footer><span>© 2026 codeswitcher</span><p>作成者：自我巨大児</p><span className="footer-language">JA / EN · 2026.10.18-r29</span><a href="https://github.com/likefack/word-scrambler" target="_blank" rel="noopener noreferrer">ソースコード（GitHub）</a></footer>
   </div>;
 }

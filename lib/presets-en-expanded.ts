@@ -637,8 +637,6 @@ export const EN_EXPANDED: Record<'business' | 'academic' | 'casual', readonly (r
     ['a lovely morning', 'a beautiful morning'],
     ['a nice walk', 'a pleasant walk'],
     ['a nice surprise', 'a lovely surprise'],
-    ['a quiet place', 'a peaceful place'],
-    ['a quiet afternoon', 'a peaceful afternoon'],
     ['a cozy room', 'a snug room'],
     ['a cosy room', 'a snug room'],
     ['a small shop', 'a little shop'],
