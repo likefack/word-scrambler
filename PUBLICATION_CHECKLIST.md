@@ -1,6 +1,6 @@
 # Source publication checks
 
-This export contains the r33 application source and portable setup files. It excludes live Site identity, Git history, runtime configuration, credentials, database contents, build output, caches and private evaluation corpora.
+This export contains the r34 application source and portable setup files. It excludes live Site identity, Git history, runtime configuration, credentials, database contents, build output, caches and private evaluation corpora.
 
 - Preserve MIT and third-party notices; the project license does not replace dependency or third-party UI/trademark terms.
 - The three new dictionary tables listed in LICENSE-SCOPE.json use CC BY-SA 4.0; application software remains MIT. Preserve DATA-LICENSE.md and the original upstream notices, including their intentional whitespace.

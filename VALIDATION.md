@@ -1,11 +1,13 @@
-# r33 export validation
+# r34 export validation
 
-Application source commit: `284afac317bbb652f95c93eb45c88e5be2f2e75c`.
-Application version: `2026.10.18-r33`.
+Application source commit: `54225828563c9c0eeaa1ed41aec7a92c843ee99d`.
+Application version: `2026.10.18-r34`.
 Date: 2026-10-18.
 
 ## Completed checks
 
+- All 80 tests in the four changed r34 suites passed in temporary Node-native TypeScript harnesses: quarter-budget/spelling, desire tails, multiline quotes and existing presets. They verify the dictionary's floor(word count / 4) ceiling, unchanged AI default ceiling, 17 filtered spelling pairs, full-output LCS counts/attribution, deterministic output and preserved registrations. Original test assertions and supplied source files are retained; only temporary compiler/import adapters differ. Full application tests, typechecking and build were not rerun here.
+- The 10 non-README packet files match their supplied before/after SHA256 values. The application README has a different baseline from the portable public README, so its measurement change is integrated into the existing public wording while retaining setup and licensing sections.
 - The r33 separately/from-complement regression suite passed all 9 tests in a temporary Node-native TypeScript harness. It covers case/whitespace, occurrence-specific complements, standalone and reverse directions, word boundaries and quoted protection. The supplied implementation and test files remain byte-identical to the verified four-file patch; only the temporary compiler/import adapter differed. Full application tests, typechecking and build were not rerun here.
 - The r32 explicit-title regression suite passed all 16 tests in a temporary Node-native TypeScript harness. It checks title assignments, ordinary title discussion, neighboring sentences, style evidence, quote behavior, UTF-16 offsets and unchanged dictionary counts. The supplied implementation and test files remain byte-identical to the verified four-file patch; only the temporary compiler/import adapter differed. Full application tests, typechecking and build were not rerun here.
 - Separate production r31 validation passed 426 tests and synthetic live-UI checks. These reported production results are distinct from local source-publication checks.
@@ -20,7 +22,7 @@ Date: 2026-10-18.
 - The r23 application checkout and its portable sync each passed 289 automated tests and TypeScript checking. The application passed the five-stage Vinext build. The r24 receipt-display follow-up passed 37 client tests, 43 independent checks, TypeScript checking and the same build; the only new behavior preserves a confirmed receipt when a sending choice is subsequently disabled.
 - An independent fixed r23 copy passed 62 checks, including real local Workerd/D1 and additional cancellation, delayed-success, key-contamination and one-send UI event tests. The execution/storage boundary hashes matched the release.
 - r22's conservative English dictionary safety fix passed 41 independent checks. Production dictionary examples confirmed that effort-adverb hard and think about are preserved while a supported adjectival hard phrase can be replaced.
-- The r33 source sync is applied against the verified public r32 baseline. Source-version metadata and public documentation are aligned without copying deployment settings or data. Existing license/data boundaries and original upstream notices are unchanged. Earlier production validation is separate from these local publication checks.
+- The r34 source sync is applied against the verified public r33 baseline. Source-version metadata and public documentation are aligned without copying deployment settings or data. Existing license/data boundaries and original upstream notices are unchanged. Earlier production validation is separate from these local publication checks.
 - Tests include anonymous admission, shared request limits, separate text-report tables, execution-time selection, secret rejection, model-output validation and browser event-handler fixtures. Provider network requests are mocked or blocked.
 - Live r23 browser and database verification confirmed one authorized synthetic source/result record with notice .5 and selection flag 1. The previous browser OFF settings were restored. No real Groq key is used in this export validation; the r24 follow-up publication is verified separately.
 - The export excludes credentials, database records, private corpora, live Site identifiers and local runtime configuration. Previously published guide PNG assets and their C2PA provenance are unchanged.

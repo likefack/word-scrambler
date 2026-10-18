@@ -63,12 +63,15 @@ export function validateInput(text: unknown): string {
   if (words(text).length < 4) throw new RewriteError('TOO_SHORT', '入力には4語以上が必要です。');
   return text;
 }
-export function applyModelOutput(text: string, raw: unknown, options: { maxEdits?: number; alignUniqueOccurrence?: boolean; checkContextGrammar?:boolean } = {}): RewriteResult {
+export function applyModelOutput(text: string, raw: unknown, options: { maxEdits?: number; alignUniqueOccurrence?: boolean; checkContextGrammar?:boolean; maxChangedWords?:number } = {}): RewriteResult {
   if (!raw || typeof raw !== 'object') throw new RewriteError('INVALID_RESPONSE', 'AIの応答を読み取れませんでした。もう一度お試しください。', 502);
   const data = raw as { style?: {label?:unknown;features?:unknown;explanation?:unknown}; edits?:unknown; protected_terms?:unknown; note?:unknown };
   if (typeof data.style?.label !== 'string' || !Array.isArray(data.style.features) || typeof data.style.explanation !== 'string' || !Array.isArray(data.edits)) throw new RewriteError('INVALID_RESPONSE', 'AIの応答形式が正しくありませんでした。もう一度お試しください。', 502);
   const totalWords = words(text).length, target = Math.max(1, Math.round(totalWords * .25));
-  const budget = Math.max(1, Math.ceil(totalWords * .32));
+  // An explicit stricter ceiling is used only by the dictionary caller. AI
+  // defaults, target, candidate ordering, schema and full-output LCS stay intact.
+  if (options.maxChangedWords !== undefined && (!Number.isInteger(options.maxChangedWords) || options.maxChangedWords < 0)) throw new RangeError('maxChangedWords must be a nonnegative integer');
+  const budget = Math.min(Math.max(1, Math.ceil(totalWords * .32)), options.maxChangedWords ?? Infinity);
   const applied: AppliedEdit[] = []; let changedWords = 0;
   // This protects source spans, without renumbering/filtering literal matches.
   // It is not a Japanese morphological parser or a semantic-equivalence test.

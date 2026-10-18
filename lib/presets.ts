@@ -6,7 +6,9 @@ import { JA_EXPANDED } from './presets-ja-expanded';
 import { EN_EXPANDED } from './presets-en-expanded';
 import { JA_CORE } from './presets-ja-core';
 import { EN_CORE } from './presets-en-core';
-import { applyModelOutput, changedWordCount, detectLanguage, validateInput, type Edit, type InputLanguage, type RewriteResult } from './rewriter';
+import { isOrthographicOnlyPair } from './presets-orthography';
+import { dictionaryWordBudget } from './presets-metrics';
+import { applyModelOutput, changedWordCount, detectLanguage, validateInput, words, type Edit, type InputLanguage, type RewriteResult } from './rewriter';
 
 export type StyleId = 'business' | 'academic' | 'casual';
 export type StyleSelection = StyleId | 'auto';
@@ -373,6 +375,7 @@ export function presetRewrite(text: string, language: InputLanguage = 'auto', st
   for (const segment of segmenter.segment(text)) { boundaries.add(segment.index); boundaries.add(segment.index + segment.segment.length); }
   const candidates: (Edit & Span & { count: number })[] = [];
   for (const [source, target] of STYLE_DICTIONARIES[actualLanguage][selected]) {
+    if (isOrthographicOnlyPair(source, target)) continue;
     const pattern = new RegExp(escapeRegex(source), actualLanguage === 'en' ? 'gi' : 'g');
     for (const match of text.matchAll(pattern)) {
       const start = match.index!, original = match[0], end = start + original.length;
@@ -434,11 +437,10 @@ export function presetRewrite(text: string, language: InputLanguage = 'auto', st
   const result = applyModelOutput(text, {
     style: { label: definition.label, features: [automatic ? 'ルールで自動推定' : '手動で辞書を指定', ...classification.evidence.slice(0, 2), `分類の手がかり：${confidenceLabel}`], explanation },
     edits, protected_terms: [], note: '',
-  }, { maxEdits: 512 });
+  }, { maxEdits: 512, maxChangedWords: dictionaryWordBudget(words(text).length) });
   // Replace AI-oriented generic notes with precise, honest descriptions of this local mode.
   result.notes = [];
-  if (!result.edits.length) result.notes.push('この文体の辞書に、安全条件を満たす候補がなかったため、原文をそのまま残しました。');
-  else if (result.ratio < 20 || result.ratio > 30) result.notes.push('辞書の候補と変更量の上限を優先したため、置き換え率は25%から離れています。');
+  if (!result.edits.length) result.notes.push('条件に合う置き換え候補がなかったため、原文をそのまま残しました。');
   result.notes.push('辞書・ルール方式です。AIの意味理解は行いません。数字・URL・引用部分を避けますが、固有名詞や文脈を完全には識別できないため、結果を確認してください。');
   if (automatic && classification.confidence < .5) result.notes.push('文体の手がかりが少ないか、複数の文体が混ざっています。合わない場合は辞書を手動で選んでください。');
   return result;

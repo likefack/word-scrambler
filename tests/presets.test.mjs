@@ -254,7 +254,7 @@ test('Japanese connective candidates do not replace a compound postposition',()=
  for(const style of ['business','academic','casual'])for(const input of ['費用に加えて、作業時間も記録する。','結果を記録した。費用に加えて、作業時間も記録する。']){
   const result=presetRewrite(input,'ja',style);assert(result.rewritten.includes('に加えて、'));assert(!result.rewritten.includes('にさらに、'));
  }
- const result=presetRewrite('加えて、作業時間も記録する。','ja','academic');assert(result.rewritten.startsWith('さらに、'));
+ const result=presetRewrite('加えて、作業時間も記録する。記録は机の上にある。','ja','academic');assert(result.rewritten.startsWith('さらに、'));
 });
 
 test('all ten hard-to adjective rules abstain when hard modifies an effort verb',()=>{

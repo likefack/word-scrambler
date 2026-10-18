@@ -32,7 +32,7 @@ test('another existing suru-to-nonsuru direction observes the same general bound
 });
 test('ordinary past, contrast, reason and enumeration still transform',()=>{
  for(const ending of ['。','が、担当者は結果を記録した。','が問題は残った。','から、結果を記録する。','けれど、結果は同じだった。','けれども、結論は保留した。','り、資料を確認したりした。']){
-  const input='その検査を実施した'+ending;
+  const input='その検査を実施した'+ending+'担当者は記録を机に置いた。';
   for(const style of ['business','academic']){const result=presetRewrite(input,'ja',style);assert(result.rewritten.includes('行った'+ending.split(/[。、]/)[0]),result.rewritten);assert(result.edits.some(e=>e.original==='実施した'&&e.replacement==='行った'),result.rewritten);}
  }
 });

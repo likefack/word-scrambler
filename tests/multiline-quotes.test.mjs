@@ -14,7 +14,7 @@ const fixtures=[
  ['en','business','Please review the checklist.'],
  ['en','academic','For example, plants need sunlight.'],
  ['en','casual','I really enjoy the walk.'],
- ['ja','business','資料をご確認ください。'],
+ ['ja','business','資料をご確認ください。担当者は部屋にいます。'],
  ['ja','academic','そのため、観察を続けた。'],
  ['ja','casual','とても楽しい一日だった。'],
 ];
