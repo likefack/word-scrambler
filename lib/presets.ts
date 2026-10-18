@@ -270,6 +270,13 @@ const SIGNALS: Record<Language, Record<StyleId, Signal[]>> = {
 };
 
 type Span = { start: number; end: number };
+// Explicit title assignment is a literal mention, even without quotation marks.
+// Merely discussing a title is not enough: 題名について and 題名は重要だが、...
+// stay eligible. A topic-led assignment needs a bounded value and identity ending.
+// Property statements with the same identity form can still conservatively abstain.
+const japaneseTitleLabel = '(?:題名|タイトル|表題|標題|副題|曲名|書名)';
+const explicitJapaneseTitle = new RegExp(
+  `(?:という|といった|と呼ばれる|との)${japaneseTitleLabel}|${japaneseTitleLabel}[\\t ]*(?:[:：]|は[\\t 、，,]*[^。！？.!?、，,\\r\\n]+(?:である|であった|です|でした|だった|だ|に(?:決まった|決めた|なった|した|する)|と(?:決めた|定めた|した|する))(?=[。！？.!?]|$))`, 'u');
 function protectedSpans(text: string): Span[] {
   const patterns = [
     /https?:\/\/[^\s「」『』<>]+/g,
@@ -286,7 +293,7 @@ function protectedSpans(text: string): Span[] {
   // A rule-based engine cannot reliably locate the exact named span, so preserve the
   // entire sentence/clause containing an explicit naming or metalinguistic cue.
   for (const match of text.matchAll(/[^。！？.!?\n]+[。！？.!?]?/g)) {
-    if (/(?:という|といった|と呼ばれる)(?:名前|名称|店名|社名|人名|語|言葉|表現|文字列)|(?:名前|名称|店名|社名|人名)|\b(?:the (?:word|phrase|term|name)|named|entitled|(?:is|was|are|were|be|been|being)\s+called)\b/i.test(match[0])) {
+    if (/(?:という|といった|と呼ばれる)(?:名前|名称|店名|社名|人名|語|言葉|表現|文字列)|(?:名前|名称|店名|社名|人名)|\b(?:the (?:word|phrase|term|name)|named|entitled|(?:is|was|are|were|be|been|being)\s+called)\b/i.test(match[0]) || explicitJapaneseTitle.test(match[0])) {
       spans.push({start:match.index!,end:match.index!+match[0].length});
     }
   }

@@ -39,7 +39,7 @@ Before distributing built assets, native dependencies, an image or an executable
 
 ## Dictionary / NLP data
 
-The r31 snapshot retains the earlier project-maintained lexical alternatives and the three selected tables in `lib/presets-en-broad.ts`, `lib/presets-ja-broad.ts`, and `lib/presets-broad-scopes.ts`. These tables use CC BY-SA 4.0. The protective/context helpers and integration code remain MIT software. `DATA-LICENSE.md` records the WordNet and wordfreq sources, offline selection, changes and attribution; original upstream notices are preserved under `public/licenses/`. The app serves these notices at `/licenses`. Preserve both software and data notices when redistributing a bundle.
+The current source snapshot retains the earlier project-maintained lexical alternatives and the three selected tables in `lib/presets-en-broad.ts`, `lib/presets-ja-broad.ts`, and `lib/presets-broad-scopes.ts`. These tables use CC BY-SA 4.0. The protective/context helpers and integration code remain MIT software. `DATA-LICENSE.md` records the WordNet and wordfreq sources, offline selection, changes and attribution; original upstream notices are preserved under `public/licenses/`. The app serves these notices at `/licenses`. Preserve both software and data notices when redistributing a bundle.
 
 Universal Dependencies r2.18 English EWT and Japanese GSD were consulted offline for context-development diagnosis. Their original README and license notices are retained under `public/licenses/UD-*`. The app includes no complete UD sentences or corpus files; the data license remains limited to the same three modules.
 
