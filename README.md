@@ -6,7 +6,7 @@
 - ソースコード: https://github.com/likefack/word-scrambler
 - 作成者: 自我巨大児
 - Copyright (c) 2026 codeswitcher
-- このソースの機能版: 2026.10.18-r29
+- このソースの機能版: 2026.10.18-r30
 
 ## 機能
 
@@ -100,4 +100,10 @@ npm run start
 
 ## ライセンス
 
-自作部分は [MIT](LICENSE)。依存コード、テンプレート、画像内の第三者UIや商標にはそれぞれの条件が適用されます。[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) と [DEPENDENCY_LICENSES.json](DEPENDENCY_LICENSES.json) を確認してください。
+アプリのコードは [MIT](LICENSE)。r30 の追加辞書データ3ファイルには別途 [CC BY-SA 4.0](DATA-LICENSE.md) が適用されます。依存コード、テンプレート、画像内の第三者UIや商標にはそれぞれの条件が適用されます。[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、[LICENSE-SCOPE.json](LICENSE-SCOPE.json)、[DEPENDENCY_LICENSES.json](DEPENDENCY_LICENSES.json) を確認してください。
+
+## Dictionary-data licenses
+
+The application software remains MIT. The new tables in `lib/presets-en-broad.ts`, `lib/presets-ja-broad.ts`, and `lib/presets-broad-scopes.ts` are separately licensed CC BY-SA 4.0. Keep their attribution, change description, and upstream notices when redistributing or adapting the data. This does not apply that data license to visitors' input or rewritten text. The new source-scope helper and merge logic remain MIT software.
+
+See [DATA-LICENSE.md](DATA-LICENSE.md), [LICENSE-SCOPE.json](LICENSE-SCOPE.json), and the bundled original notices under `public/licenses/`. The deployed app provides the same notices at `/licenses`. wordfreq was used offline for selection; no frequency values, rank table, corpus text, or runtime NLP package is bundled.

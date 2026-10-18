@@ -2,7 +2,7 @@
 
 ## Scope
 
-The root MIT license applies to this project's original work. It does not replace the license, attribution, patent, source-availability or redistribution terms attached to third-party code, fonts, icons or data. This review archive contains source, not `node_modules`, package tarballs, built JavaScript, native binaries or a container image.
+The root MIT license applies to the application software. The three additional dictionary tables listed in `LICENSE-SCOPE.json` use CC BY-SA 4.0 as described in `DATA-LICENSE.md`. The root license does not replace the license, attribution, patent, source-availability or redistribution terms attached to third-party code, fonts, icons or data. This review archive contains source, not `node_modules`, package tarballs, built JavaScript, native binaries or a container image.
 
 ## Notices retained in this source tree
 
@@ -39,10 +39,10 @@ Before distributing built assets, native dependencies, an image or an executable
 
 ## Dictionary / NLP data
 
-This source snapshot contains project-maintained lexical alternatives, not a redistributed WordNet database or extracted WordNet dataset. Work on dictionary/NLP expansion is ongoing elsewhere. If those changes are incorporated, add the exact data source, upstream version, modification/extraction description and complete required notices before publishing. Re-run the inventory and source scan against the final snapshot.
+The r30 snapshot retains the earlier project-maintained lexical alternatives and adds the three selected tables in `lib/presets-en-broad.ts`, `lib/presets-ja-broad.ts`, and `lib/presets-broad-scopes.ts`. These tables use CC BY-SA 4.0. The new protective helper and integration code remain MIT software. `DATA-LICENSE.md` records the WordNet and wordfreq sources, offline selection, changes and attribution; original upstream notices are preserved under `public/licenses/`. The app serves these notices at `/licenses`. Preserve both software and data notices when redistributing a bundle.
 
 ## Guide illustrations added after r10
 
 `public/guide/` contains instructional Groq-interface screenshots with annotations and explicitly labeled schematic illustrations. Groq interface elements and trademarks remain their respective owners' material; the project's MIT license does not grant separate rights in third-party trademarks or interfaces. The guide distinguishes cropped/annotated screenshots from explanatory diagrams. No real API key or private account row is included in the reviewed assets. The project-maintained UI, arrows, annotations and explanatory text do not imply affiliation with Groq.
 
-The dependency lock entries are unchanged from the previously inventoried r10 export. No WordNet, Sudachi dictionary, spaCy model or Python NLP dataset was added to this r21 source export.
+The dependency lock entries are unchanged from the previously inventoried r10 export. The r30 additions are selected derived dictionary tables; no raw WordNet database, Sudachi dictionary, wordfreq frequency/rank table, corpus text or runtime NLP package is bundled.

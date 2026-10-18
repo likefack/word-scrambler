@@ -1,3 +1,7 @@
+import{allowsBroadMatch}from'./presets-broad-guards';
+import{BROAD_SCOPES}from'./presets-broad-scopes';
+import{JA_BROAD}from'./presets-ja-broad';
+import{EN_BROAD}from'./presets-en-broad';
 import { JA_EXPANDED } from './presets-ja-expanded';
 import { EN_EXPANDED } from './presets-en-expanded';
 import { JA_CORE } from './presets-ja-core';
@@ -219,8 +223,8 @@ function combine(...inventories: (readonly Pair[])[]): readonly Pair[] {
   return inventories.flat().filter(([source])=>{if(seen.has(source))return false;seen.add(source);return true;});
 }
 export const STYLE_DICTIONARIES: Record<Language, Record<StyleId, readonly Pair[]>> = {
-  ja: {business:combine(BASE_DICTIONARIES.ja.business,JA_EXPANDED.business,JA_CORE.business),academic:combine(BASE_DICTIONARIES.ja.academic,JA_EXPANDED.academic,JA_CORE.academic),casual:combine(BASE_DICTIONARIES.ja.casual,JA_EXPANDED.casual,JA_CORE.casual)},
-  en: {business:combine(BASE_DICTIONARIES.en.business,EN_EXPANDED.business,EN_CORE.business),academic:combine(BASE_DICTIONARIES.en.academic,EN_EXPANDED.academic,EN_CORE.academic),casual:combine(BASE_DICTIONARIES.en.casual,EN_EXPANDED.casual,EN_CORE.casual)},
+  ja: {business:combine(BASE_DICTIONARIES.ja.business,JA_EXPANDED.business,JA_CORE.business,JA_BROAD.business),academic:combine(BASE_DICTIONARIES.ja.academic,JA_EXPANDED.academic,JA_CORE.academic,JA_BROAD.academic),casual:combine(BASE_DICTIONARIES.ja.casual,JA_EXPANDED.casual,JA_CORE.casual,JA_BROAD.casual)},
+  en: {business:combine(BASE_DICTIONARIES.en.business,EN_EXPANDED.business,EN_CORE.business,EN_BROAD.business),academic:combine(BASE_DICTIONARIES.en.academic,EN_EXPANDED.academic,EN_CORE.academic,EN_BROAD.academic),casual:combine(BASE_DICTIONARIES.en.casual,EN_EXPANDED.casual,EN_CORE.casual,EN_BROAD.casual)},
 };
 
 type Signal = { pattern: RegExp; weight: number; description: string };
@@ -366,6 +370,8 @@ export function presetRewrite(text: string, language: InputLanguage = 'auto', st
     for (const match of text.matchAll(pattern)) {
       const start = match.index!, original = match[0], end = start + original.length;
       if (!boundaries.has(start) || !boundaries.has(end) || overlaps({ start, end }, immutable)) continue;
+      const broadScope = BROAD_SCOPES[[actualLanguage,selected,source,target].join('\0')];
+      if (broadScope && !allowsBroadMatch(text,start,end,broadScope)) continue;
       // Partial lexical substitutions must not strand honorific お/ご prefixes.
       if (actualLanguage === 'ja' && /^[\p{Script=Han}]/u.test(original) && /[おご]/.test(text[start-1]??'')) continue;
       // The connective 加えて is safe here only at a sentence boundary. In
