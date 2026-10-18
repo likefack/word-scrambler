@@ -188,3 +188,18 @@ export const diagnosticTextReports = sqliteTable('diagnostic_text_reports', {
   check('diagnostic_text_version',sql`length(${table.appVersion}) BETWEEN 1 AND 32 AND ${table.consentVersion}='2026-10-18.4'`),
   check('diagnostic_text_date',sql`length(${table.serverReceivedAt})=24`),
 ]);
+
+/** Execution-time sending selection; never interpret this as affirmative consent. */
+export const automaticDiagnosticTextReports = sqliteTable('automatic_diagnostic_text_reports', {
+ reportId:text('report_id').primaryKey().notNull(), conversionId:text('conversion_id').notNull(),
+ appVersion:text('app_version').notNull(),mode:text('mode').notNull(),language:text('language').notNull(),
+ originalText:text('original_text').notNull(),rewrittenText:text('rewritten_text').notNull(),
+ selectionOnAtExecution:integer('selection_on_at_execution').notNull(),noticeVersion:text('notice_version').notNull(),serverReceivedAt:text('server_received_at').notNull(),
+},table=>[
+ index('automatic_text_received_idx').on(table.serverReceivedAt),index('automatic_text_conversion_idx').on(table.conversionId),
+ check('automatic_text_ids',sql`length(${table.reportId})=36 AND length(${table.conversionId})=36`),
+ check('automatic_text_mode',sql`${table.mode} IN ('preset','ai')`),check('automatic_text_language',sql`${table.language} IN ('ja','en')`),
+ check('automatic_text_content',sql`length(${table.originalText}) BETWEEN 1 AND 3000 AND length(${table.rewrittenText}) BETWEEN 1 AND 3000`),
+ check('automatic_text_selected',sql`${table.selectionOnAtExecution}=1`),check('automatic_text_notice',sql`${table.noticeVersion}='2026-10-18.5' AND length(${table.appVersion}) BETWEEN 1 AND 32`),
+ check('automatic_text_received',sql`length(${table.serverReceivedAt})=24`),
+]);

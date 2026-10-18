@@ -50,6 +50,13 @@
       "when": 1792308049856,
       "tag": "0006_diagnostic_text_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1792310916847,
+      "tag": "0007_automatic_diagnostic_text_reports",
+      "breakpoints": true
     }
   ]
 }

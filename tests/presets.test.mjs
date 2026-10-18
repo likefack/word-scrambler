@@ -256,3 +256,26 @@ test('Japanese connective candidates do not replace a compound postposition',()=
  }
  const result=presetRewrite('加えて、作業時間も記録する。','ja','academic');assert(result.rewritten.startsWith('さらに、'));
 });
+
+test('all ten hard-to adjective rules abstain when hard modifies an effort verb',()=>{
+ const pairs=[...new Map(Object.values(STYLE_DICTIONARIES.en).flat().filter(([source,target])=>/^hard to\b/.test(source)&&/^difficult to\b/.test(target)).map(pair=>[pair[0],pair])).values()];assert.equal(pairs.length,10);
+ const prefixes=['We work ','They tried very ','We are working quite ','They will study ','We push ourselves ','We have been trying really '];
+ for(const style of ['business','academic','casual']){const saved=STYLE_DICTIONARIES.en[style];try{
+  for(const pair of pairs){STYLE_DICTIONARIES.en[style]=[pair];for(const prefix of prefixes){const text=`${prefix}${pair[0]} this detail before lunch.`;assert.equal(presetRewrite(text,'en',style).rewritten,text,`${style}: ${text}`);}}
+ }finally{STYLE_DICTIONARIES.en[style]=saved;}}
+});
+test('hard-to rules preserve recognized copular adjective contexts and modifiers',()=>{
+ const pairs=[...new Map(Object.values(STYLE_DICTIONARIES.en).flat().filter(([source,target])=>/^hard to\b/.test(source)&&/^difficult to\b/.test(target)).map(pair=>[pair[0],pair])).values()];
+ const prefixes=['It is ','It was not too ','It has been especially ','It will be really ','It\'s ','It’s ','It isn’t particularly '];
+ const saved=STYLE_DICTIONARIES.en.academic;try{for(const pair of pairs){STYLE_DICTIONARIES.en.academic=[pair];for(const prefix of prefixes){const text=`${prefix}${pair[0]} this detail without a diagram.`;const result=presetRewrite(text,'en','academic');assert.equal(result.rewritten,text.replace(pair[0],pair[1]),text);assert.equal(result.changedWords,1);}}}finally{STYLE_DICTIONARIES.en.academic=saved;}
+});
+test('hard-to frame checks do not infer adjective use across clauses, unknown verbs or token fragments',()=>{
+ const saved=STYLE_DICTIONARIES.en.business;try{STYLE_DICTIONARIES.en.business=[['hard to understand','difficult to understand']];for(const prefix of ['It is tricky, but we work ','It was simple. We tried ','This ','We consider it ','It is trying very ','It is\nwe work ',`This${' '.repeat(126)}`]){const text=`${prefix}hard to understand the records today.`;assert.equal(presetRewrite(text,'en','business').rewritten,text,text);}}finally{STYLE_DICTIONARIES.en.business=saved;}
+});
+test('full dictionaries retain effort meaning and do not strand think or talk before regarding',()=>{
+ for(const style of ['business','academic','casual']){
+  for(const text of ['We work hard to understand the records, even when the ink has faded.','We tried very hard to find the missing receipt before lunch.']){const result=presetRewrite(text,'en',style);assert(!/\b(?:work|tried very) difficult to\b/i.test(result.rewritten));assert(result.rewritten.includes('hard to'),result.rewritten);}
+  for(const text of ['The clerk will think about the proposal.','They talk about the proposal after breakfast.']){const result=presetRewrite(text,'en',style);assert(!/\b(?:think|talk) regarding\b/i.test(result.rewritten));}
+ }
+ assert.equal(presetRewrite('The instructions are hard to understand without a diagram.','en','academic').rewritten,'The instructions are difficult to understand without a diagram.');
+});

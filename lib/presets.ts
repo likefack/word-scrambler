@@ -138,7 +138,6 @@ const BASE_DICTIONARIES: Record<Language, Record<StyleId, readonly Pair[]>> = {
       ['complete the project', 'finish the project'],
       ['start the meeting', 'begin the meeting'],
       ['before the meeting', 'prior to the meeting'],
-      ['about the proposal', 'regarding the proposal'],
       ['respond to your email', 'reply to your email'],
       ['thank you for your help', 'thank you for your assistance'],
       ['can help with', 'can assist with'],
@@ -341,6 +340,14 @@ function matchCase(original: string, replacement: string): string | null {
 }
 function sentenceStart(text: string, index: number): boolean { return !text.slice(0, index).trim() || /[.!?。！？\n]\s*$/.test(text.slice(0, index)); }
 
+// "hard" is both an adjective (is hard to read) and an effort adverb
+// (works hard to read). A bare phrase match cannot distinguish these senses.
+// Only a nearby, explicit copular frame licenses hard -> difficult here.
+// Unrecognized constructions stay unchanged rather than guessing their POS.
+function hasAdjectivalHardFrame(text: string, start: number): boolean {
+  return /(?:^|[^\p{L}\p{M}\p{N}_'’])(?:am|is|are|was|were|be|been|being|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|(?:it|that|there|he|she)['’]s|(?:we|you|they)['’]re|i['’]m)[ \t]+(?:(?:not|very|too|so|quite|rather|especially|particularly|extremely|really|more|less|most|least|somewhat|unusually|still|just)[ \t]+){0,3}$/iu.test(text.slice(0, start));
+}
+
 export function presetRewrite(text: string, language: InputLanguage = 'auto', style: StyleSelection = 'auto'): RewriteResult {
   validateInput(text);
   const actualLanguage = language === 'auto' ? detectLanguage(text) : language;
@@ -364,6 +371,7 @@ export function presetRewrite(text: string, language: InputLanguage = 'auto', st
       // noun + に加えて it is part of a compound postposition, not an adverb.
       if (actualLanguage === 'ja' && source === '加えて、' && !sentenceStart(text, start)) continue;
       if (actualLanguage === 'en' && /[-_'’]/.test((text[start - 1] ?? '') + (text[end] ?? ''))) continue;
+      if (actualLanguage === 'en' && /^hard to\b/i.test(source) && /^difficult to\b/i.test(target) && !hasAdjectivalHardFrame(text, start)) continue;
       // A compound-capable kanji noun cannot safely become a verbal/noun phrase
       // inside another kanji compound (e.g. 作業 + 手順 -> 作業 + 進め方).
       if (actualLanguage === 'ja' && original.endsWith('した') && /^(?:い|く|かっ|けれ)/.test(text.slice(end)) && !target.endsWith('した')) continue;

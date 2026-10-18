@@ -14,3 +14,12 @@ export function saveDiagnosticPreference(getStore:()=>PreferenceStore,enabled:bo
  if(typeof enabled!=='boolean')return false;
  try{getStore().setItem(DIAGNOSTIC_PREFERENCE_KEY,enabled?'on':'off');return true;}catch{return false;}
 }
+
+/** Only on/off is stored. An unavailable or malformed preference fails OFF. */
+export const TEXT_DIAGNOSTIC_PREFERENCE_KEY='expression-scrambler.text-diagnostics.v1';
+export function readTextDiagnosticPreference(getStore:()=>PreferenceStore):DiagnosticPreference{
+ try{const value=getStore().getItem(TEXT_DIAGNOSTIC_PREFERENCE_KEY);if(value===null)return {enabled:true,status:'ready'};if(value==='on'||value==='off')return {enabled:value==='on',status:'ready'};return {enabled:false,status:'invalid'};}catch{return {enabled:false,status:'unavailable'};}
+}
+export function saveTextDiagnosticPreference(getStore:()=>PreferenceStore,enabled:boolean):boolean{
+ if(typeof enabled!=='boolean')return false;try{getStore().setItem(TEXT_DIAGNOSTIC_PREFERENCE_KEY,enabled?'on':'off');return true;}catch{return false;}
+}
