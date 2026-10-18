@@ -244,3 +244,15 @@ test('AI candidate summary accounts for accepted, rejected and capped candidates
   const q=result.selection;assert.equal(q.proposed,q.accepted+Object.values(q.rejected).reduce((a,b)=>a+b,0));
   assert.equal(q.rejected.overlap,1);assert.equal(q.rejected.original_not_found,1);assert.equal(q.rejected.limit,1);
 });
+test('honorific prefixes are not stranded by a partial lexical substitution',()=>{
+ for(const style of ['business','academic','casual']){const result=presetRewrite('現時点の状況をご報告します。','ja',style);assert(!result.rewritten.includes('ご伝え'));assert(result.rewritten.includes('ご報告します'));}
+});
+test('physical viewpoint is not replaced by an abstract perspective',()=>{
+ for(const style of ['business','academic','casual'])assert(presetRewrite('撮影では視点の高さと画角を考慮する。','ja',style).rewritten.includes('視点の高さ'));
+});
+test('Japanese connective candidates do not replace a compound postposition',()=>{
+ for(const style of ['business','academic','casual'])for(const input of ['費用に加えて、作業時間も記録する。','結果を記録した。費用に加えて、作業時間も記録する。']){
+  const result=presetRewrite(input,'ja',style);assert(result.rewritten.includes('に加えて、'));assert(!result.rewritten.includes('にさらに、'));
+ }
+ const result=presetRewrite('加えて、作業時間も記録する。','ja','academic');assert(result.rewritten.startsWith('さらに、'));
+});

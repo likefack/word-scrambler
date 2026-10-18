@@ -35,7 +35,7 @@ export function ErrorReportButton({ diagnostic }: { diagnostic: unknown }) {
         signal: AbortSignal.timeout(15_000),
       });
       if (!response.ok) {
-        const message = response.status === 401 ? 'サインインが必要です。ページを開き直してから送信してください。'
+        const message = response.status === 401 ? '接続を確認できません。ページを開き直してから送信してください。'
           : response.status === 429 ? '送信が続いているため、少し待ってからもう一度お試しください。'
           : response.status === 400 || response.status === 413 ? '診断情報を受け付けられませんでした。もう一度処理してからお試しください。'
           : response.status === 403 ? 'このサイトのページを開き直してから送信してください。'

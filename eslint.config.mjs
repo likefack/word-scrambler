@@ -5,14 +5,6 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  {
-    files: ["app/page.tsx", "app/guide/page.tsx"],
-    rules: {
-      // Native full-document navigation is intentional: it resets transient
-      // key state and is protected by tests/navigation.test.mjs.
-      "@next/next/no-html-link-for-pages": "off",
-    },
-  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

@@ -13,7 +13,7 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "setup:local": "node scripts/setup-local.mjs",
-    "test": "node --test tests/*.test.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
     "test:dictionaries": "node tests/presets-en-core.sanity.mjs && node tests/presets-ja-core.sanity.mjs && node tests/presets-ja-expanded.sanity.mjs",
     "typecheck": "tsc --noEmit"
   },

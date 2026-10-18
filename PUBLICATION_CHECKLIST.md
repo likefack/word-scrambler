@@ -1,38 +1,9 @@
-# 公開前チェックリスト
+# Source publication checks
 
-初回公開版: 2026-10-18、r10ベース。公開先: https://github.com/likefack/word-scrambler 。表示名は「表現スクランブラ」です。この文書の完了項目は、この初回公開ソースについてのみ有効です。
+This export contains the r21 application source and portable setup files. It excludes live Site identity, Git history, runtime configuration, credentials, database contents, build output, caches and private evaluation corpora.
 
-## このレビュー版で準備済み
-
-- [x] 履歴を含まないソーススナップショットを作成。元リポジトリと実サイトは変更しない
-- [x] 自作部分のMITライセンスを同梱（Copyright (c) 2026 codeswitcher、作成者 自我巨大児）
-- [x] 同梱されていたSitesプラグインとshadcn CSSのライセンス表示を保持。Next.jsスターターのMIT表示も追加
-- [x] 固定lockfileから直接・推移・プラットフォーム依存を棚卸しし、MIT以外の条件を明記
-- [x] 実サイト設定に代えて、ID・秘密情報を含まないローカル設定テンプレートを用意
-- [x] 本番認証の依存関係、別基盤へ配備するときの危険、ローカル模擬認証の制限を文書化
-- [x] 提供者キー方式を無効のまま保持。APIの認証・Origin検査を削除しない
-- [x] 起動・テストのコマンド、検証結果と未確認範囲を文書化
-- [x] 公開用アーカイブに`.git`、実`.env`、`.dev.vars`、`.openai`、ローカル実行状態、画面画像、DB、ビルド出力、`node_modules`を含めない
-
-## 最終公開の前に必須
-
-- [x] 初回公開対象をr10ベースに固定。進行中のデザイン変更・辞書/NLP改善は後続commitで扱う
-- [x] r10公開対象ファイルを秘密情報・個人情報・サイト固有設定について検査。検出例外は合成テスト値・予約ドメイン・汎用テンプレート値のみ
-- [ ] 今後の変更やバイナリ配布前に、依存ライセンス・脆弱性を再点検し、配布物に含まれるNOTICE等を保持する
-- [x] クリーンインストール、116テスト、辞書サニティ、型検査、lint、build、ローカル起動を検証。初回失敗と対応・未確認範囲は `VALIDATION.md` に明記
-- [ ] 実ブラウザでレイアウト、モバイル、エラー/キャンセル/戻る操作、キーの寿命、サインイン/アウトを確認する
-- [ ] 認証基盤を含む本番経路で匿名API拒否、偽造認証ヘッダーの除去、直接迂回の防止を確認する
-- [ ] ローカル/本番DBのマイグレーション、保持期限、バックアップ・ログの設定を確認する
-- [x] GitHubのPrivate vulnerability reportingを有効にし、`SECURITY.md` を実在する報告先に更新
-- [x] 既存の作業用Git履歴をpushせず、検査したファイルのみで新しい公開履歴を作る
-- [x] 所有者の依頼に基づき、r10公開対象、リポジトリ名、MITライセンス、公開操作を確認
-
-## 後続のデザイン・辞書/NLP更新時
-
-- [ ] r10との差分を確認し、テストと公開用秘密検査をやり直す
-- [ ] WordNet/NLPデータの出典・版・加工内容・必須ライセンス表示を確認する
-- [ ] 依存関係が変わった場合はlockfileからライセンス棚卸しを更新する
-
-## 実施していない操作
-
-このソース公開作業では、実サイトの設定変更や配備、実APIキーでの推論は行っていません。実サイトの更新とは独立したソース公開です。
+- Preserve MIT and third-party notices; the project license does not replace dependency or third-party UI/trademark terms.
+- The public source contains clearly synthetic credential fixtures only. Pattern scans are a review aid, not proof that no secret can ever be present.
+- Runtime recipient/key settings are not bundled. New deployments must configure their own data policy and operations.
+- Use explicit non-personal author and committer identities when publishing Git commits. Repository source files do not control Git commit metadata.
+- The published website and GitHub source are independently deployed; use the version and application commit in VALIDATION.md to compare them.

@@ -1,3 +1,4 @@
+import { admissionFixturePlugin } from './helpers/admission-fixture.mjs';
 // Native Workerd fetch, intercepted only at its outbound service boundary.
 // No network, real credentials, production identity, or provider inference.
 import test, {after} from 'node:test';
@@ -7,7 +8,7 @@ import {fileURLToPath} from 'node:url';
 import {build} from 'esbuild';
 import {Miniflare} from 'miniflare';
 const route=fileURLToPath(new URL('../app/api/rewrite/route.ts',import.meta.url));
-const built=await build({stdin:{contents:`import {POST} from ${JSON.stringify(route)}; export default {fetch:POST};`,resolveDir:process.cwd(),sourcefile:'runtime-fixture.ts'},bundle:true,write:false,format:'esm',platform:'neutral',target:'es2022',external:['cloudflare:workers'],plugins:[{name:'test-auth-only',setup(b){b.onResolve({filter:/chatgpt-auth$/},()=>({path:'fixture-auth',namespace:'fixture'}));b.onResolve({filter:/^server-only$/},()=>({path:'fixture-server-only',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},({path})=>({contents:path==='fixture-auth'?'export async function getChatGPTUser(){return {userId:"isolated-test-user"};}':'export {};',loader:'js'}));}}]});
+const built=await build({stdin:{contents:`import {POST} from ${JSON.stringify(route)}; export default {fetch:POST};`,resolveDir:process.cwd(),sourcefile:'runtime-fixture.ts'},bundle:true,write:false,format:'esm',platform:'neutral',target:'es2022',external:['cloudflare:workers'],plugins:[admissionFixturePlugin(new URL('..',import.meta.url).pathname.replace(/\/$/,'')),{name:'test-auth-only',setup(b){b.onResolve({filter:/chatgpt-auth$/},()=>({path:'fixture-auth',namespace:'fixture'}));b.onResolve({filter:/^server-only$/},()=>({path:'fixture-server-only',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},({path})=>({contents:path==='fixture-auth'?'export async function getChatGPTUser(){return {userId:"isolated-test-user"};}':'export {};',loader:'js'}));}}]});
 const dummy='gsk_native_workerd_fixture_not_a_real_key';
 const input='Please review the document before the meeting.';
 const calls=[];

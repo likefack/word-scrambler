@@ -1,0 +1,20 @@
+{
+  "app_version": "2026.10.18-r21",
+  "app_source_commit": "d30cbdb0dd4648a54a6a2cbe3f93ae51a52728e7",
+  "source_export_date": "2026-10-18",
+  "portable_adaptations": [
+    "package name and scripts",
+    "local hosting example",
+    "setup-local script",
+    "public README and security/validation documentation",
+    "license and third-party notices"
+  ],
+  "excluded": [
+    "Git history",
+    "live Site identity",
+    "runtime configuration and secrets",
+    "database records",
+    "private evaluation corpora",
+    "build output and caches"
+  ]
+}

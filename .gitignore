@@ -57,7 +57,3 @@ next-env.d.ts
 
 # Incremental TypeScript cache
 *.tsbuildinfo
-
-# Site-specific deployment settings and local secret bindings
-/.openai/
-.dev.vars*

@@ -1,5 +1,5 @@
 import { env } from 'cloudflare:workers';
-import { getChatGPTUser } from '../../chatgpt-auth';
+import { admitPublicApi } from '../../../lib/public-api-admission';
 import {
   ERROR_REPORT_BODY_LIMIT, ERROR_REPORT_MAX_ROWS, ERROR_REPORT_RETENTION_MS,
   isErrorReportId, validateErrorReportDiagnostic,
@@ -7,13 +7,8 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-// Authentication required; identities are checked, never stored or used as log fields.
-// These small per-instance guards are best effort, NOT a global account quota.
-const MINUTE_MS = 60_000;
-const HOUR_MS = 60 * MINUTE_MS;
+// Public intake, with global D1 attempt budgets before body parsing.
 const BODY_TIMEOUT_MS = 10_000;
-let active = false;
-let attempts: number[] = [];
 
 const reply = (status: number, code: string, extra: Record<string, string> = {}) =>
   Response.json({ code }, { status, headers: {
@@ -61,11 +56,8 @@ async function readBoundedJson(request: Request): Promise<unknown> {
 
 // POST only. There is deliberately no report-listing, GET, admin, or dump route.
 export async function POST(request: Request) {
-  let reserved = false;
   try {
     if (request.method !== 'POST') return reply(405, 'REPORT_METHOD', { Allow: 'POST' });
-    const user = await getChatGPTUser();
-    if (!user || typeof user.userId !== 'string' || !user.userId) return reply(401, 'AUTH_REQUIRED');
     const origin = request.headers.get('origin');
     if (!origin || origin !== new URL(request.url).origin) return reply(403, 'ORIGIN_MISMATCH');
     const contentType = request.headers.get('content-type') || '';
@@ -76,17 +68,9 @@ export async function POST(request: Request) {
     const reportIdHeader = request.headers.get('x-report-id');
     if (!isErrorReportId(reportIdHeader)) return reply(400, 'REPORT_INVALID');
     const reportId = reportIdHeader.toLowerCase();
+    const admission = await admitPublicApi((env as {DB?:D1Database}).DB, 'error_reports');
+    if (!admission.allowed) return reply(admission.status, admission.status===429?'REPORT_RATE_LIMIT':'REPORT_UNAVAILABLE', {'Retry-After':String(admission.retryAfter)});
     const now = Date.now();
-    attempts = attempts.filter(at => now - at < HOUR_MS);
-    if (active) return reply(429, 'REPORT_BUSY', { 'Retry-After': '1' });
-    const recent = attempts.filter(at => now - at < MINUTE_MS);
-    const waitUntil = Math.max(
-      recent.length >= 10 ? recent[0] + MINUTE_MS : 0,
-      attempts.length >= 100 ? attempts[0] + HOUR_MS : 0,
-    );
-    if (waitUntil > now) return reply(429, 'REPORT_RATE_LIMIT', { 'Retry-After': String(Math.ceil((waitUntil - now) / 1_000)) });
-    active = true; reserved = true; attempts.push(now);
-
     const diagnostic = validateErrorReportDiagnostic(await readBoundedJson(request), now);
     if (!diagnostic) return reply(400, 'REPORT_INVALID');
     const database = (env as { DB?: D1Database }).DB;
@@ -97,7 +81,8 @@ export async function POST(request: Request) {
     // D1 batch is transactional: retain bounded records, deduplicate retries, and
     // return the originally stored receipt. Every value uses a bound parameter.
     // Only migration-owned tables are used; no request-time DDL or raw JSON blobs.
-    const results = await database.batch([
+    let writeTimer: ReturnType<typeof setTimeout> | undefined;
+    const results = await Promise.race([database.batch([
       database.prepare('DELETE FROM error_reports WHERE server_received_at < ?').bind(cutoff),
       database.prepare(`INSERT INTO error_reports
         (report_id, request_id, code, stage, http_status, upstream_status, version, timestamp, server_received_at)
@@ -109,7 +94,7 @@ export async function POST(request: Request) {
       )`).bind(ERROR_REPORT_MAX_ROWS),
       database.prepare("SELECT report_id, server_received_at FROM error_reports WHERE report_id = ? OR (request_id = ? AND request_id <> 'unavailable') LIMIT 1")
         .bind(reportId, diagnostic.requestId),
-    ]);
+    ]),new Promise<never>((_,reject)=>{writeTimer=setTimeout(()=>reject(new Error('storage_unavailable')),3000);})]).finally(()=>clearTimeout(writeTimer));
     if (results.length !== 4 || results.some(result => !result.success)) return reply(503, 'REPORT_UNAVAILABLE');
     const receipt = results[3].results?.[0] as { report_id?: unknown; server_received_at?: unknown } | undefined;
     if (!receipt || !isErrorReportId(receipt.report_id) ||
@@ -122,7 +107,5 @@ export async function POST(request: Request) {
     if (error instanceof ReportRequestError) return reply(error.status, error.code);
     // Neither raw exceptions nor database/provider details reach the browser/logs.
     return reply(503, 'REPORT_UNAVAILABLE');
-  } finally {
-    if (reserved) active = false;
   }
 }

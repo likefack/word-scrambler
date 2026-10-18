@@ -1,63 +1,24 @@
-# 検証記録
+# r21 export validation
 
-検証日: 2026-10-18
+Application source commit: `d30cbdb0dd4648a54a6a2cbe3f93ae51a52728e7`.
+Application version: `2026.10.18-r21`.
+Date: 2026-10-18.
 
-元ソース: r10 / commit `094a54e3233a2098ded4653fa4fd959aa457f8fb` の履歴なしスナップショット。
+## Completed checks
 
-環境: Linux、Node.js v24.19.0、npm 11.9.0、lockfileに固定された依存関係。
+- The application checkout passed 267 automated tests, TypeScript checking and the five-stage Vinext build.
+- The preceding r20 portable export passed 266 tests, typechecking, local setup and the build. The r21 export changes only the diagnostic settings copy, application version and one display regression test. Its 28 client tests, typechecking, local setup and build were repeated successfully. The exact application files are checked against the r21 source commit.
+- Tests include real local Workerd/D1 execution, anonymous admission, shared request limits, separate text-report tables, consent/secret rejection, model-output validation and browser event-handler fixtures. Provider network requests are mocked or blocked.
+- An independent r21 copy review passed 32 client/preference tests and confirmed that consent, storage and POST conditions are unchanged.
+- An independent r20 review passed 92 selected and additional checks. It found and corrected an over-broad privacy-text replacement before publication.
+- The deployed r20 UI was checked in a cloud browser: attachment starts OFF, the parent setting controls availability, the current synthetic execution is previewed, consent starts OFF, edits are possible, and switching the parent OFF removes the unsent preview. No text attachment or real AI key was submitted in that check.
+- The source export was scanned for credential patterns, personal email, private paths and live Site identifiers. Matches were limited to explicit synthetic test fixtures, reserved example addresses and generic dependency/template paths. PNG guide assets have no text or EXIF metadata fields; their C2PA provenance is retained.
+- Application files match the cited commit. Portable setup, package name/scripts, licensing and public documentation are export-specific adaptations.
 
-## 成功した検査
+## Environment and limits
 
-- クリーンな依存関係インストール: `npm run install:ci`、697パッケージをインストール。
-- `npm run setup:local`: 秘密情報のない設定例を生成。2回目は既存設定を上書きしないことを確認。
-- `npm test`: 116テスト成功、失敗/スキップ0。
-- `npm run test:dictionaries`: 英語コア、日本語コア、日本語拡張の3スイート成功。
-- `npm run typecheck`: 成功。
-- `npm run lint`: 最終状態で成功。
-- `npm run build`: 成功。Vinextは一部ページの静的/動的分類を判定できない旨の案内を出力。build失敗ではありません。
-- README記載のローカルD1初期化: 3つのSQLコマンドが成功。
-- ローカル開発サーバー: `/` と `/guide` がHTTP 200。
-- ローカル開発サーバー: 未認証の `/api/status`、`/api/rewrite`、`/api/error-reports` は401。偽の認証ヘッダーを付けた未認証リクエストも401。
-- ローカル模擬サインイン: サインイン後のstatusは200、提供者キー利用可能フラグはfalse。キー未指定のAI呼び出しは400、別Originは403。
-- ビルド済みWorkerのローカル起動: `/` と `/guide` は200。未認証のstatus・AI・診断APIは401。
-- 公開アーカイブに含めるファイルに対する秘密情報パターン・メール・ローカルパス検査: 未解決の検出なし。検出したキー形式は合成テスト値のみ、メールは予約済みテストドメインのみ。実値をこの記録へ転載していません。
+Validation used Node.js 24.19.0, npm 11.9.0 and the pinned lockfile. The dependency package entries are unchanged from the previously installed and validated r10 export; this run reused the same installed dependency tree rather than doing a fresh network install. Other platforms and every supported Node version were not tested.
 
-HTTP確認は同一環境内のローカルサーバーに対して実施し、実Groqキーも本番アカウントも使用していません。アプリのAPI認証処理を検証用に無効化する変更はしていません。
+The portable build was run with `NODE_OPTIONS=--max-old-space-size=2048`. Automated tests are intentionally serial. A concurrent build in the application environment was killed under resource pressure; a separate build succeeded. Resource needs can differ on another machine.
 
-## 初回失敗と対応
-
-- 最初の依存インストールは、隔離環境でホームディレクトリへ書き込めず失敗。READMEに記載したプロジェクト内npmキャッシュを指定し、最初から再インストールして成功。
-- ビルド済みWorkerの初回起動も同様にWrangler設定領域への書き込みで失敗。README記載のプロジェクト内 `XDG_CONFIG_HOME` を指定して成功。
-- 初回lintは内部リンクに関するNext.js規則の4件で失敗。既存テストは、ページ遷移時の一時キー状態をリセットする通常のリンクを明示的に要求しています。挙動を変えずに、対象2画面だけこの規則の例外をコメント付きで定義し、lintを再実行して成功。
-- 起動スモークでは実行セッションの分離と開発ロックの残留があり、停止済みプロセスのロックを除去したうえで、サーバーとHTTPクライアントを同一セッションで起動して成功。配布物にこのロックやローカル状態は含めていません。
-
-## 公開準備のための変更
-
-- package名を `word-scrambler` に統一。テスト・型検査・ローカル設定生成のnpm scriptsを追加。
-- 秘密情報を含まない設定テンプレートと、既存設定を上書きしない生成スクリプトを追加。
-- `.openai/` と `.dev.vars*` を無視対象へ追加。
-- README、MIT、SECURITY、第三者ライセンス一覧、公開チェックリスト、検証記録を追加/更新。
-- r10の「owner-private Site」という古いコメントだけを、認証必須という実装に沿う表現へ修正。
-- 意図的な通常リンクに対するlint例外を対象2画面だけ追加。
-
-認証チェック、AI処理、辞書データ、提供者キーの無効化、公開サイトの設定は変更していません。
-
-## 未実施・保証しない範囲
-
-- このアーカイブを公開サイトへ配備する操作、GitHubへの作成/push/公開。
-- 実Groqアカウント・実キーでのAI実行。
-- 実ブラウザによる画面・フォーカス・戻る/進む・モバイル表示の網羅的検証。
-- Sites本番基盤のヘッダー除去、セッション検証、Workerへの直接アクセス防止についての独立監査。
-- D1診断送信から実DBの保存/重複排除/期限切れ削除までのHTTP経由の端から端の確認。SQL初期化と自動テストは実施済み。
-- 他OS・他Nodeバージョンでの確認。
-- 依存パッケージの最新脆弱性データベースとの照合。インストールは監査なしで行い、ライセンス一覧はlockfileのメタデータから作成。
-- 全ファイルの由来についての法的監査、配布用bundleに含まれる第三者コードの抽出・NOTICE集約。
-- 任意の文章の文法・意味・自然さ、25%の変更率、ウォーターマーク回避/除去の効果。
-
-検査の成功は秘密情報や不具合が絶対に存在しない証明ではありません。変更後は該当検査を再実行してください。
-
-## 初回GitHub公開時の名称更新と再検証
-
-2026-10-18、アプリの表示名を「表現スクランブラ」へ変更しました。機能コードの変更はなく、3つの画面・メタデータファイル内の名称文字列のみ置換しています。README、SECURITY、公開チェックリストを、実在する公開リポジトリと有効化済みの非公開脆弱性報告窓口へ更新しました。
-
-公開用の156ファイルと実行状態を分離した別の検証ディレクトリで、同じr10検証用のインストール済み依存関係を再利用し、ローカル設定生成、116テスト、3つの辞書サニティ、型検査、lint、buildがすべて成功しました。この再検証では依存関係の再インストールは行っていません。実行時設定、依存関係ディレクトリ、生成物は公開ファイルに含めていません。
+There was no real Groq inference in these source-export tests. A mocked provider and local Worker tests do not establish universal production networking, semantic accuracy, security or third-party service behavior. The application export contains no runtime credentials, live Site identity, database, production environment settings or Git history.

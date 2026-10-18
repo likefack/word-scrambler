@@ -1,0 +1,33 @@
+.contact-page{max-width:800px;margin:0 auto;padding:28px 24px 56px;font-size:16px;line-height:1.8}
+.contact-page nav a,.contact-page footer a{display:inline-flex;align-items:center;min-height:44px}
+.contact-page header{margin:24px 0}
+.contact-page h1{font-size:28px;line-height:1.5;font-weight:600;margin-bottom:8px}
+.contact-page h2{font-size:20px;line-height:1.6;margin:0 0 12px;font-weight:600}
+.contact-page p+p{margin-top:12px}
+.contact-page header p,.contact-notice p,.contact-handling p,.contact-form-note{color:var(--muted)}
+.contact-notice{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);padding:16px 20px;margin:24px 0}
+.contact-notice p{font-size:14px;margin-top:8px}
+.contact-form{background:#fff;border:1px solid var(--line);padding:24px;margin-top:24px}
+.contact-form fieldset{border:0;padding:0;margin:0;min-width:0}
+.contact-field{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.contact-field>span{font-weight:600}
+.contact-required,.contact-optional{font-size:13px;font-weight:400;color:var(--muted);margin-left:8px}
+.contact-form input[type=text],.contact-form input[type=email],.contact-form textarea{border:1px solid var(--control);border-radius:3px;padding:10px 12px;font-size:16px;background:#fff;max-width:100%;width:100%;min-width:0}
+.contact-form textarea{min-height:220px;line-height:1.8;max-height:none}
+.contact-form small{font-size:14px;color:var(--muted);overflow-wrap:anywhere}
+.contact-check{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.8;cursor:pointer;margin:12px 0;min-height:44px}
+.contact-check input{flex-shrink:0;width:20px;height:20px;min-height:20px;margin:4px 0 0;accent-color:var(--accent)}
+.contact-main-consent{border-top:1px solid var(--line);padding-top:20px;margin-top:20px}
+.contact-submit{display:block;width:100%;background:var(--accent);color:#fff;border:0;border-radius:3px;min-height:48px;padding:10px 16px;font-weight:600;margin-top:20px}
+.contact-submit:disabled{background:#e5e7eb;color:#606975}
+.contact-form-note{font-size:14px;margin-top:12px}
+.contact-error{border-left:3px solid #9d2017;background:#fff2f0;padding:12px;color:#8a1c12;margin-top:16px;overflow-wrap:anywhere}
+.contact-handling{border-top:1px solid var(--line);margin-top:32px;padding-top:24px}
+.contact-handling p{font-size:14px}
+.contact-success{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);padding:24px}
+.contact-success a{display:inline-flex;align-items:center;min-height:44px;margin:12px 20px 0 0}
+.contact-success button{padding:8px 12px;border:1px solid var(--control);background:#fff;border-radius:3px}
+.contact-receipt{font-family:monospace;overflow-wrap:anywhere}
+.contact-page footer{display:flex;gap:12px 24px;flex-wrap:wrap;font-size:14px;margin-top:24px}
+.contact-honeypot,.contact-visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@media(max-width:600px){.contact-page{padding:20px 16px 40px}.contact-page h1{font-size:24px}.contact-form,.contact-success{padding:18px 16px}.contact-notice{padding:14px 16px}}

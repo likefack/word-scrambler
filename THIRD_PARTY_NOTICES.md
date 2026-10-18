@@ -39,4 +39,10 @@ Before distributing built assets, native dependencies, an image or an executable
 
 ## Dictionary / NLP data
 
-This r10 snapshot contains project-maintained lexical alternatives, not a redistributed WordNet database or extracted WordNet dataset. Work on dictionary/NLP expansion is ongoing elsewhere. If those changes are incorporated, add the exact data source, upstream version, modification/extraction description and complete required notices before publishing. Re-run the inventory and source scan against the final snapshot.
+This source snapshot contains project-maintained lexical alternatives, not a redistributed WordNet database or extracted WordNet dataset. Work on dictionary/NLP expansion is ongoing elsewhere. If those changes are incorporated, add the exact data source, upstream version, modification/extraction description and complete required notices before publishing. Re-run the inventory and source scan against the final snapshot.
+
+## Guide illustrations added after r10
+
+`public/guide/` contains instructional Groq-interface screenshots with annotations and explicitly labeled schematic illustrations. Groq interface elements and trademarks remain their respective owners' material; the project's MIT license does not grant separate rights in third-party trademarks or interfaces. The guide distinguishes cropped/annotated screenshots from explanatory diagrams. No real API key or private account row is included in the reviewed assets. The project-maintained UI, arrows, annotations and explanatory text do not imply affiliation with Groq.
+
+The dependency lock entries are unchanged from the previously inventoried r10 export. No WordNet, Sudachi dictionary, spaCy model or Python NLP dataset was added to this r21 source export.

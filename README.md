@@ -1,44 +1,41 @@
 # 表現スクランブラ
 
-日本語・英語の文章を、元の文体をなるべく保ちながら部分的に言い換える実験用Webアプリです。テキストウォーターマークの撹乱に関する実験を目的としていますが、検出の回避・除去を実証するものではありません。
+日本語・英語の文章を、元の文体をなるべく保ちながら部分的に言い換える実験用Webアプリです。
 
 - 公開サイト: https://kotoba-style-rewriter.regal-raven-5622.chatgpt.site
-- 作成者: 自我巨大児
-- 自作部分の著作権: Copyright (c) 2026 codeswitcher
 - ソースコード: https://github.com/likefack/word-scrambler
-- 初回公開版: 2026-10-18 / r10ベース（表示名を「表現スクランブラ」へ変更）
+- 作成者: 自我巨大児
+- Copyright (c) 2026 codeswitcher
+- このソースの機能版: 2026.10.18-r21
 
-このリポジトリはr10を初回公開対象とするソーススナップショットです。進行中のデザイン変更・辞書/NLP改善は含まれません。これらは後続の変更として検査・追加します。公開サイトの状態と、このソースの状態は一致しない場合があります。
+## 機能
 
-## 機能と制約
+- Groq APIを利用した1回の文体判定・置換候補生成。利用者自身のキーを実行時に渡します。
+- 日本語・英語と3文体に対応する、ブラウザ内の機械的な辞書置換。
+- 原文と変換後の比較、変更箇所、実際に変わった原文語数の割合、個別取り消し。
+- スワイプ・タブ・左右矢印での前後表示切り替え。
+- 本文を含まない診断情報の任意送信、送信前に編集・同意する任意の本文添付。
+- 問い合わせフォームと、設定時だけ動くHMAC保護の問い合わせ転送用outbox。
 
-- 日本語・英語、ビジネス・学術・カジュアルの文体判定
-- ブラウザ内の辞書による機械的な置換
-- 利用者自身のGroq APIキーを使うAI置換
-- 変更箇所・原文比較・実置換率の表示と、変更の個別取り消し
-- APIキー・本文を含めない、利用者の操作による診断レポート送信
-
-約25%の語句置換を目標に改善していますが、任意の文章でこの割合に達することや、文法・意味の正確さを保証していません。置換しない方が安全と判断した候補は採用しません。評価文章に対する結果を、一般的な品質やウォーターマークに対する効果の証明として扱わないでください。
-
-提供者キー方式は実装を保持したまま `lib/features.ts` で無効化されています。キーを設定しただけでは有効になりません。再有効化には認証・分散レート制限・利用額の制御を含む別の安全確認が必要です。
+意味・文法・文体の完全な保持や、任意の文章に対する一定の置換頻度は保証しません。表示する実置換率は原文語数のLCS差分であり、意味保持やウォーターマーク除去の成功率ではありません。ウォーターマーク撹乱に関する実験用途を含みますが、その効果は実証していません。
 
 ## 構成
 
-TypeScript / React / Vinext / Cloudflare Workers / D1 / Drizzle / Groq API。
+TypeScript / React / Vinext / Cloudflare Workers / D1 / Drizzle / Groq API。Pythonの形態素解析器はこの本番ソースには組み込まれていません。単語の分割・計数には `Intl.Segmenter` を使います。
 
-- `app/`: 画面、ガイド、APIルート
-- `lib/presets*.ts`: 置換辞書とルール
-- `lib/rewriter*.ts`: 入力検証、AI出力の適用、文法・文脈に関する保守的な検査
-- `app/chatgpt-auth.ts`: Sitesが付与する認証済みヘッダーの読み取り
-- `build/`: Workerエントリーポイント、Sites連携、開発時認証
-- `drizzle/`: 診断レポート用D1スキーマ
-- `tests/`: ダミー入力・ダミーキーを用いる自動テスト
+- `app/`: UI、ガイド、規約・プライバシー、公開POSTルート
+- `lib/presets*.ts`: 辞書・文体判定・保守的な境界判定
+- `lib/rewriter*.ts`: 原文一致、文法・意味属性の限定的な検査、編集適用
+- `lib/server-model-format.ts`: 固定モデル `openai/gpt-oss-20b` へのJSON-object要求と厳格なローカル検証
+- `lib/public-api-admission.ts`: D1で共有する匿名API受付上限
+- `db/schema.ts` / `drizzle/`: スキーマと追記式の移行
+- `tests/`: 合成文章・ダミーキー・模擬Groqを使うテスト
+
+提供者キー方式は非表示で、公開変換ルートからの利用も拒否します。秘密を設定するだけでは有効になりません。再利用には別途の設計・安全確認が必要です。
 
 ## ローカル開発
 
-必要環境はNode.js 22.13.0以上、npm、ネイティブのCloudflare Workerdを実行できるOSです。検証したNode/npmと結果は [VALIDATION.md](VALIDATION.md) を参照してください。全OS・全Nodeバージョンでの動作は未確認です。
-
-プロジェクトのルートで実行します。
+Node.js 22.13.0以上、npm、ネイティブWorkerdが実行できるOSが必要です。
 
 ```sh
 npm run setup:local
@@ -46,76 +43,52 @@ npm run install:ci
 npm run dev -- --host 127.0.0.1
 ```
 
-ブラウザで `http://127.0.0.1:5173` を開きます。`setup:local` は実サイトIDも秘密情報も含まない `config/hosting.local.example.json` から、無視対象の `.openai/hosting.json` を作成します。既存の設定は上書きしません。`package-lock.json` を維持し、`npm run install:ci` で固定された依存関係をインストールしてください。
+`http://127.0.0.1:5173` を開きます。`setup:local` は実サイトID・秘密なしの `config/hosting.local.example.json` から、無視対象の `.openai/hosting.json` を作ります。既存の設定を上書きしません。
 
-ホームディレクトリに書き込めない隔離環境では、npmとWranglerの作業領域をプロジェクト配下へ指定します（POSIXシェル）。通常の環境では不要です。
+ホームディレクトリへ書き込めない環境では、作業用ディレクトリを指定できます。
 
 ```sh
 export npm_config_cache="$PWD/.sites-runtime/npm-cache"
 export XDG_CONFIG_HOME="$PWD/.sites-runtime/xdg-config"
 ```
 
-開発サーバーにはループバック接続専用の模擬サインインがあります。ブラウザで `http://127.0.0.1:5173/signin-with-chatgpt?return_to=%2F` を開くと架空のローカルユーザーとして動作します。本番ChatGPTアカウントへの認証ではありません。開発サーバーをLAN・トンネル・公衆インターネットへ公開しないでください。
+辞書処理はキー不要です。AIの実行は本文とキーをローカルサーバー経由でGroqへ送り、利用者のGroq契約の利用枠・料金に従います。一般APIはログイン不要ですが、サーバーAPIを使うにはD1の移行が必要です。ローカル開発サーバーを公衆インターネットへ公開しないでください。
 
-機械的な置換にはGroq APIキーは不要です。AI呼び出しを実行すると、入力本文と利用者のキーがローカルサーバーを経由してGroqへ送られ、利用者のGroq契約に従って利用枠や料金が消費されます。自動テストは実キーを使わず、Groqへのリクエストを模擬または遮断します。
+### ローカルDB
 
-### 診断レポート用のローカルDB
-
-テーブルを作らない状態では、レポート送信は利用不可として失敗します。ローカルDBだけを初期化する例です。
+ビルドしてから、同梱の移行を番号順にローカルDBへ適用します。次はPOSIXシェル用です。
 
 ```sh
 npm run build
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_error_reports.sql
+for migration in drizzle/*.sql; do
+  node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file "$migration"
+done
 ```
 
-この例に `--remote` を付けないでください。開発サーバーとの状態保存先が異なる環境では、同じ `persist-to` の設定を確認してください。D1保存・削除の端から端までの実動作について、未検証の範囲は [VALIDATION.md](VALIDATION.md) に明記しています。
+`--remote` を追加しないでください。既に適用済みの移行を重ねて実行せず、開発サーバーと同じ状態保存先を使ってください。移行がなければサーバーAPIは安全側で受付を拒否します。問い合わせ転送は秘密・運転フラグ・切替時刻が揃わない限り停止状態です。
 
-### ビルド後の確認
+### 検証
 
 ```sh
+npm run test
+npm run test:dictionaries
+npm run typecheck
 npm run build
 npm run start
 ```
 
-`start` はビルド済みWorkerをローカルで起動します。模擬サインインを提供するVite開発サーバーとは異なり、Sitesの認証基盤は再現しません。AI・診断・ステータスAPIが未認証として拒否されるのは、この起動方法では想定内です。
+テストは直列で実行します。実Groqキーは使いません。現在の検証結果と範囲は [VALIDATION.md](VALIDATION.md)、境界・報告方法は [SECURITY.md](SECURITY.md) を参照してください。
 
-## テスト
+## データと配備
 
-```sh
-npm test
-npm run test:dictionaries
-npm run typecheck
-npm run lint
-npm run build
-```
+- キーはブラウザの一時メモリから同一サイト中継を通してGroqへ送信します。アプリの永続ストレージに保存しません。
+- 通常診断は件数・時間・固定分類のみ。初期ONですが保存済みOFFを維持し、OFFでも変換できます。
+- 本文添付は初期OFF。実行後に内容を編集し、専用同意と送信操作を行った場合だけ保存します。
+- 問い合わせは別の自由文機能です。転送先をソースやブラウザへ埋め込まず、別途承認された秘密設定・受信側設定を必要とします。
+- 公開読取APIはありません。サイトの運営者、基盤、ブラウザ拡張等を含めた完全な秘密保護を保証するものではありません。
 
-- `npm test`: `tests/*.test.mjs`。Reactハンドラーやソース検証、模擬認証、Workerd境界で遮断した外部通信などを含みます。
-- `test:dictionaries`: 各辞書の保守的なサニティチェック。全文章に対する自然さや意味の同一性を検証するものではありません。
-- `tests/presets-ja-expanded.dev.mjs`: 開発用評価。通常の合否判定からは分けています。
-- ブラウザの実際の履歴・フォーカス・認証遷移、公開環境の設定、実Groq呼び出しを自動テストだけで保証することはできません。
+別の環境へ配備する場合は、表示される運営者・規約・プライバシー説明・問い合わせの運用、アクセス設定、D1、秘密管理、濫用防止を自分の環境に合わせてください。実サイトの設定・DB・キーはこのソースに含まれません。
 
-## Sites以外へ配備するときの重要事項
+## ライセンス
 
-このリポジトリは、任意のホスティングへそのまま安全に配備できる汎用テンプレートではありません。
-
-1. `getChatGPTUser()` はSitesの信頼できる入口が設定した `oai-authenticated-user-*` ヘッダーを信頼します。この関数自体は署名やセッションを検証しません。一般のインターネットから受け取った同名ヘッダーをそのまま信頼してはいけません。
-2. 別基盤では、入口で外部由来の認証ヘッダーを除去し、独立したセッション検証・認可を行い、Workerへの直接迂回を防止してください。`getChatGPTUser()` のチェックを削除する対処はしないでください。
-3. `/signin-with-chatgpt`、`/signout-with-chatgpt`、`/callback` の本番動作、D1バインド、ドメイン、TLS、Secretsは配備基盤が担当します。ローカル設定例はこれらをプロビジョニングしません。
-4. Origin検査はCSRF対策の一部であり、認証の代わりではありません。プロセス内の同時実行制限は分散環境の全体クォータ・費用上限ではありません。
-5. Sites連携やconnector previewの補助ファイルは保持していますが、本アプリの言い換え機能は接続アプリを必要としません。実サイトの設定、プレビューセッション、トークンは同梱していません。
-
-公開サイトは閲覧可能でも、AI・診断レポート・ステータスのAPIには認証が必要です。詳細は [SECURITY.md](SECURITY.md) を参照してください。
-
-## データと秘密情報
-
-機械的な置換の本文はブラウザ内で処理します。AI方式では本文とAPIキーがアプリサーバーを経由してGroqへ送られます。APIキーはアプリのローカルストレージに保存する設計ではありませんが、ブラウザ拡張、開発者ツール、ネットワーク/配備基盤を含む全経路の安全を保証するものではありません。
-
-診断レポートは固定の項目だけを受け付け、本文、APIキー、氏名、メール、自由記述は保存対象にしません。DBの行数・保持期間は [SECURITY.md](SECURITY.md) を参照してください。実際のHTTPアクセスログ等は配備先で別途確認が必要です。
-
-`.env*`、`.dev.vars*`、`.openai/`、`.sites-runtime/`、`.wrangler/`、ビルド結果、認証Cookie、実利用者データを公開しないでください。
-
-## ライセンスと公開前の確認
-
-自作部分は [MIT License](LICENSE) です。第三者ファイルや依存ライブラリは各自のライセンスに従います。MITの記載がそれらの条件を上書きすることはありません。
-
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、[PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md)、[VALIDATION.md](VALIDATION.md) を確認してください。r10版にはWordNet抽出データや新しいNLPライブラリは含まれていません。これらを追加する際は、出典・変更内容・必要な著作権/ライセンス表示を追加して再検査します。
+自作部分は [MIT](LICENSE)。依存コード、テンプレート、画像内の第三者UIや商標にはそれぞれの条件が適用されます。[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) と [DEPENDENCY_LICENSES.json](DEPENDENCY_LICENSES.json) を確認してください。

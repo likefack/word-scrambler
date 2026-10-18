@@ -358,6 +358,11 @@ export function presetRewrite(text: string, language: InputLanguage = 'auto', st
     for (const match of text.matchAll(pattern)) {
       const start = match.index!, original = match[0], end = start + original.length;
       if (!boundaries.has(start) || !boundaries.has(end) || overlaps({ start, end }, immutable)) continue;
+      // Partial lexical substitutions must not strand honorific お/ご prefixes.
+      if (actualLanguage === 'ja' && /^[\p{Script=Han}]/u.test(original) && /[おご]/.test(text[start-1]??'')) continue;
+      // The connective 加えて is safe here only at a sentence boundary. In
+      // noun + に加えて it is part of a compound postposition, not an adverb.
+      if (actualLanguage === 'ja' && source === '加えて、' && !sentenceStart(text, start)) continue;
       if (actualLanguage === 'en' && /[-_'’]/.test((text[start - 1] ?? '') + (text[end] ?? ''))) continue;
       // A compound-capable kanji noun cannot safely become a verbal/noun phrase
       // inside another kanji compound (e.g. 作業 + 手順 -> 作業 + 進め方).

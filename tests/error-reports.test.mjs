@@ -1,3 +1,4 @@
+import { admissionFixtureModule } from './helpers/admission-fixture.mjs';
 // Dummy diagnostics only. No real credentials, external requests, or hosted DBs.
 // Runtime integration below executes the actual handler and SQL in Miniflare/workerd.
 import test, { after } from 'node:test';
@@ -21,6 +22,8 @@ const routeSource = source('app/api/error-reports/route.ts');
 const libraryPath = join(temp, 'error-reports.mjs');
 writeFileSync(libraryPath, transpile(librarySource));
 const limits = await import(url(libraryPath));
+const admissionPath=join(temp,'unit-admission.mjs');
+writeFileSync(admissionPath,admissionFixtureModule(source('lib/public-api-admission.ts')));
 const originalFetch = globalThis.fetch;
 const originalNow = Date.now;
 after(() => { globalThis.fetch = originalFetch; Date.now = originalNow; rmSync(temp, { recursive: true, force: true }); });
@@ -45,6 +48,7 @@ async function fixture() {
   const routePath = join(directory, 'route.mjs');
   writeFileSync(routePath, transpile(routeSource)
     .replace(/(['"])cloudflare:workers\1/g, JSON.stringify(url(contextPath)))
+    .replace(/(['"])\.\.\/\.\.\/\.\.\/lib\/public-api-admission\1/g, JSON.stringify(url(admissionPath)))
     .replace(/(['"])\.\.\/\.\.\/chatgpt-auth\1/g, JSON.stringify(url(contextPath)))
     .replace(/(['"])\.\.\/\.\.\/\.\.\/lib\/error-reports\1/g, JSON.stringify(url(libraryPath))));
   const { state } = await import(url(contextPath));
@@ -106,13 +110,10 @@ test('diagnostic enums, HTTP bounds, canonical dates, versions, and UUIDs are st
   for (const code of emitted.filter(code => !['POST', 'HTTP_'].includes(code))) assert.ok(limits.ERROR_REPORT_CODES.includes(code), code);
 });
 
-test('only authenticated same-origin JSON POST is accepted, with no listing endpoint', async () => {
+test('only anonymous same-origin JSON POST is accepted, with no listing endpoint', async () => {
   const f = await fixture();
   assert.equal(f.GET, undefined);
-  f.state.user = null;
-  await expectCode(await f.POST(request()), 401, 'AUTH_REQUIRED');
-  f.state.user = { userId: '' };
-  await expectCode(await f.POST(request()), 401, 'AUTH_REQUIRED');
+  f.state.user = null; // Public intake does not consult an identity.
   f.state.user = { userId: 'fixture-owner', email };
   for (const origin of ['', 'null', 'https://other.example', 'https://private-site.example.evil', 'http://private-site.example']) {
     await expectCode(await f.POST(request(undefined, { headers: { origin } })), 403, 'ORIGIN_MISMATCH');
@@ -140,42 +141,11 @@ test('byte-size, malformed JSON, unknown fields, and invalid UTF-8 fail before S
   assert.equal(f.operations.length, 0);
 });
 
-test('rate protection limits ten attempts per minute and one active request per instance', async () => {
-  const f = await fixture();
-  for (let index = 0; index < 10; index++) assert.equal((await f.POST(request())).status, 200);
-  const limited = await f.POST(request());
-  assert.ok(Number(limited.headers.get('retry-after')) > 0);
-  await expectCode(limited, 429, 'REPORT_RATE_LIMIT');
-  const g = await fixture();
-  const underlyingBatch = g.state.env.DB.batch;
-  let unblock;
-  let notify;
-  const blocked = new Promise(resolve => { unblock = resolve; });
-  const started = new Promise(resolve => { notify = resolve; });
-  g.state.env.DB.batch = async statements => { notify(); await blocked; return underlyingBatch(statements); };
-  const pending = g.POST(request());
-  await started;
-  await expectCode(await g.POST(request()), 429, 'REPORT_BUSY');
-  unblock();
-  assert.equal((await pending).status, 200);
-});
+// Former per-isolate/auth case is superseded by public-api-admission.test.mjs,
+// which uses independent Workerd instances and real shared D1 transactions.
 
-test('hundred-attempt rolling-hour bound also applies across minute windows', async () => {
-  const f = await fixture();
-  const start = originalNow();
-  let now = start;
-  Date.now = () => now;
-  try {
-    for (let minute = 0; minute < 10; minute++) {
-      now = start + minute * 60_000;
-      for (let attempt = 0; attempt < 10; attempt++) assert.equal((await f.POST(request(diagnostic()))).status, 200);
-    }
-    now = start + 10 * 60_000;
-    await expectCode(await f.POST(request()), 429, 'REPORT_RATE_LIMIT');
-    now = start + 60 * 60_000;
-    assert.equal((await f.POST(request())).status, 200);
-  } finally { Date.now = originalNow; }
-});
+// Former per-isolate/auth case is superseded by public-api-admission.test.mjs,
+// which uses independent Workerd instances and real shared D1 transactions.
 
 test('only whitelist scalars are bound to fixed SQL; real request IDs and report IDs deduplicate separately', async () => {
   const f = await fixture();
@@ -208,11 +178,8 @@ test('only whitelist scalars are bound to fixed SQL; real request IDs and report
   assert.doesNotMatch(routeSource, /console\s*\.|INSERT[^]*\$\{|CREATE TABLE|ALTER TABLE/);
 });
 
-test('storage/auth exceptions remain generic and release in-flight protection', async () => {
+test('storage exceptions remain generic after admission', async () => {
   const f = await fixture();
-  f.state.authError = new Error(secret);
-  await expectCode(await f.POST(request()), 503, 'REPORT_UNAVAILABLE');
-  f.state.authError = null;
   const db = f.state.env.DB;
   f.state.env.DB = undefined;
   await expectCode(await f.POST(request()), 503, 'REPORT_UNAVAILABLE');
@@ -225,7 +192,8 @@ test('storage/auth exceptions remain generic and release in-flight protection', 
 async function runtimeFixture() {
   // Only the auth helper is substituted. Production handler, validation, runtime
   // env binding, request streams, transaction, and SQL execute in workerd.
-  const script = `${transpile(librarySource).replace(/^export /gm, "")}\n${transpile(routeSource).replace(/^export /gm, "")
+  const script = `${readFileSync(admissionPath,'utf8').replace(/^export /gm,'')}\n${transpile(librarySource).replace(/^export /gm, "")}\n${transpile(routeSource).replace(/^export /gm, "")
+    .replace(/import\s*\{[^}]*\}\s*from ['"]\.\.\/\.\.\/\.\.\/lib\/public-api-admission['"];?/, '')
     .replace(/import\s*\{[^}]*\}\s*from ['"]\.\.\/\.\.\/chatgpt-auth['"];?/, 'async function getChatGPTUser() { return { userId: "fixture-owner" }; }')
     .replace(/import\s*\{[^}]*\}\s*from ['"]\.\.\/\.\.\/\.\.\/lib\/error-reports['"];?/, '')}\nexport default {fetch: POST};`;
   const mf = new Miniflare({ modules: true, script, compatibilityDate: '2026-05-15', d1Databases: { DB: 'error-reports-fixture' }, outboundService: () => { throw new Error('External network is forbidden in these tests'); } });

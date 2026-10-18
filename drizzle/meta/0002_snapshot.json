@@ -1,0 +1,568 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "42e1ff4b-7bd3-4201-9ed6-6606dae79678",
+  "prevId": "9c5996ee-27e2-49af-a29b-708bc7b05640",
+  "tables": {
+    "contact_submissions": {
+      "name": "contact_submissions",
+      "columns": {
+        "submission_id": {
+          "name": "submission_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reply_email": {
+          "name": "reply_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "subject": {
+          "name": "subject",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "body": {
+          "name": "body",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "consent_version": {
+          "name": "consent_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "consented_at": {
+          "name": "consented_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reply_requested": {
+          "name": "reply_requested",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "server_received_at": {
+          "name": "server_received_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        }
+      },
+      "indexes": {
+        "contact_received_at_idx": {
+          "name": "contact_received_at_idx",
+          "columns": [
+            "server_received_at"
+          ],
+          "isUnique": false
+        },
+        "contact_status_received_idx": {
+          "name": "contact_status_received_idx",
+          "columns": [
+            "status",
+            "server_received_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "contact_id_length": {
+          "name": "contact_id_length",
+          "value": "length(\"contact_submissions\".\"submission_id\") = 36"
+        },
+        "contact_email_length": {
+          "name": "contact_email_length",
+          "value": "\"contact_submissions\".\"reply_email\" IS NULL OR length(\"contact_submissions\".\"reply_email\") BETWEEN 3 AND 254"
+        },
+        "contact_subject_length": {
+          "name": "contact_subject_length",
+          "value": "length(\"contact_submissions\".\"subject\") BETWEEN 1 AND 120"
+        },
+        "contact_body_length": {
+          "name": "contact_body_length",
+          "value": "length(\"contact_submissions\".\"body\") BETWEEN 1 AND 4000"
+        },
+        "contact_consent_version_length": {
+          "name": "contact_consent_version_length",
+          "value": "length(\"contact_submissions\".\"consent_version\") BETWEEN 1 AND 32"
+        },
+        "contact_date_lengths": {
+          "name": "contact_date_lengths",
+          "value": "length(\"contact_submissions\".\"consented_at\") = 24 AND length(\"contact_submissions\".\"server_received_at\") = 24"
+        },
+        "contact_reply_consent": {
+          "name": "contact_reply_consent",
+          "value": "(\"contact_submissions\".\"reply_requested\" = 0 AND \"contact_submissions\".\"reply_email\" IS NULL) OR (\"contact_submissions\".\"reply_requested\" = 1 AND \"contact_submissions\".\"reply_email\" IS NOT NULL)"
+        },
+        "contact_status_values": {
+          "name": "contact_status_values",
+          "value": "\"contact_submissions\".\"status\" = 'pending'"
+        }
+      }
+    },
+    "conversion_diagnostics": {
+      "name": "conversion_diagnostics",
+      "columns": {
+        "conversion_id": {
+          "name": "conversion_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "app_version": {
+          "name": "app_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "consent_version": {
+          "name": "consent_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mode": {
+          "name": "mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_category": {
+          "name": "provider_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "style": {
+          "name": "style",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "total_words": {
+          "name": "total_words",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "proposed": {
+          "name": "proposed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "applied": {
+          "name": "applied",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "changed_words": {
+          "name": "changed_words",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "elapsed_ms": {
+          "name": "elapsed_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_ms": {
+          "name": "provider_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "validation_ms": {
+          "name": "validation_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stage": {
+          "name": "stage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "server_received_at": {
+          "name": "server_received_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reject_context_duplicate": {
+          "name": "reject_context_duplicate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_grammar_join": {
+          "name": "reject_grammar_join",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_scope_change": {
+          "name": "reject_scope_change",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_semantic_attribute": {
+          "name": "reject_semantic_attribute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_invalid_edit": {
+          "name": "reject_invalid_edit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_unchanged": {
+          "name": "reject_unchanged",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_original_not_found": {
+          "name": "reject_original_not_found",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_occurrence_out_of_range": {
+          "name": "reject_occurrence_out_of_range",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_overlap": {
+          "name": "reject_overlap",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_immutable_change": {
+          "name": "reject_immutable_change",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_newline_change": {
+          "name": "reject_newline_change",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_edit_too_large": {
+          "name": "reject_edit_too_large",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_total_budget": {
+          "name": "reject_total_budget",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_target_reached": {
+          "name": "reject_target_reached",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_protected_term": {
+          "name": "reject_protected_term",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_full_text_budget": {
+          "name": "reject_full_text_budget",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reject_limit": {
+          "name": "reject_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "conversion_diagnostics_received_idx": {
+          "name": "conversion_diagnostics_received_idx",
+          "columns": [
+            "server_received_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "conversion_diagnostics_source": {
+          "name": "conversion_diagnostics_source",
+          "value": "(\"conversion_diagnostics\".\"source\" = 'preset_client' AND \"conversion_diagnostics\".\"mode\" = 'preset') OR (\"conversion_diagnostics\".\"source\" = 'ai_server' AND \"conversion_diagnostics\".\"mode\" = 'ai')"
+        },
+        "conversion_diagnostics_language": {
+          "name": "conversion_diagnostics_language",
+          "value": "\"conversion_diagnostics\".\"language\" IN ('ja','en','unknown')"
+        },
+        "conversion_diagnostics_style": {
+          "name": "conversion_diagnostics_style",
+          "value": "\"conversion_diagnostics\".\"style\" IN ('business','academic','casual','unknown')"
+        },
+        "conversion_diagnostics_state": {
+          "name": "conversion_diagnostics_state",
+          "value": "\"conversion_diagnostics\".\"status\" IN ('ok','failed')"
+        },
+        "conversion_diagnostics_words": {
+          "name": "conversion_diagnostics_words",
+          "value": "\"conversion_diagnostics\".\"total_words\" BETWEEN 0 AND 3000 AND \"conversion_diagnostics\".\"changed_words\" BETWEEN 0 AND \"conversion_diagnostics\".\"total_words\""
+        },
+        "conversion_diagnostics_candidates": {
+          "name": "conversion_diagnostics_candidates",
+          "value": "\"conversion_diagnostics\".\"proposed\" BETWEEN 0 AND 512 AND \"conversion_diagnostics\".\"applied\" BETWEEN 0 AND \"conversion_diagnostics\".\"proposed\""
+        },
+        "conversion_diagnostics_times": {
+          "name": "conversion_diagnostics_times",
+          "value": "\"conversion_diagnostics\".\"elapsed_ms\" BETWEEN 0 AND 180000 AND \"conversion_diagnostics\".\"provider_ms\" BETWEEN 0 AND \"conversion_diagnostics\".\"elapsed_ms\" AND \"conversion_diagnostics\".\"validation_ms\" BETWEEN 0 AND \"conversion_diagnostics\".\"elapsed_ms\""
+        }
+      }
+    },
+    "error_reports": {
+      "name": "error_reports",
+      "columns": {
+        "report_id": {
+          "name": "report_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stage": {
+          "name": "stage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "http_status": {
+          "name": "http_status",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "upstream_status": {
+          "name": "upstream_status",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "server_received_at": {
+          "name": "server_received_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "error_reports_request_id_unique": {
+          "name": "error_reports_request_id_unique",
+          "columns": [
+            "request_id"
+          ],
+          "isUnique": true,
+          "where": "\"error_reports\".\"request_id\" <> 'unavailable'"
+        },
+        "error_reports_received_at_idx": {
+          "name": "error_reports_received_at_idx",
+          "columns": [
+            "server_received_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "error_reports_id_lengths": {
+          "name": "error_reports_id_lengths",
+          "value": "length(\"error_reports\".\"report_id\") = 36 AND (length(\"error_reports\".\"request_id\") = 36 OR \"error_reports\".\"request_id\" = 'unavailable')"
+        },
+        "error_reports_code_length": {
+          "name": "error_reports_code_length",
+          "value": "length(\"error_reports\".\"code\") BETWEEN 1 AND 64"
+        },
+        "error_reports_stage_length": {
+          "name": "error_reports_stage_length",
+          "value": "length(\"error_reports\".\"stage\") BETWEEN 1 AND 32"
+        },
+        "error_reports_version_length": {
+          "name": "error_reports_version_length",
+          "value": "length(\"error_reports\".\"version\") BETWEEN 1 AND 32"
+        },
+        "error_reports_date_lengths": {
+          "name": "error_reports_date_lengths",
+          "value": "length(\"error_reports\".\"timestamp\") = 24 AND length(\"error_reports\".\"server_received_at\") = 24"
+        },
+        "error_reports_http_status_bounds": {
+          "name": "error_reports_http_status_bounds",
+          "value": "\"error_reports\".\"http_status\" = 0 OR \"error_reports\".\"http_status\" BETWEEN 100 AND 599"
+        },
+        "error_reports_upstream_status_bounds": {
+          "name": "error_reports_upstream_status_bounds",
+          "value": "\"error_reports\".\"upstream_status\" IS NULL OR \"error_reports\".\"upstream_status\" BETWEEN 100 AND 599"
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

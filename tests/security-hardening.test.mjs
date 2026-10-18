@@ -1,3 +1,4 @@
+import { admissionFixturePlugin } from './helpers/admission-fixture.mjs';
 // Synthetic secrets only; every provider request is intercepted before network I/O.
 import test,{after} from 'node:test';
 import assert from 'node:assert/strict';
@@ -14,7 +15,7 @@ let sequence=0;
 const success=()=>Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({style:{label:'Business',features:[],explanation:''},edits:[],protected_terms:[],note:''})}}]});
 async function fixture(){
  const statePath=join(temp,`state-${sequence++}.mjs`);writeFileSync(statePath,'export const state={user:{userId:"fixture-user"},env:{}};export const env=state.env;export async function getChatGPTUser(){return state.user;}');
- const output=await build({entryPoints:[join(root,'app/api/rewrite/route.ts')],bundle:true,write:false,format:'esm',platform:'node',target:'es2022',plugins:[{name:'isolated-boundaries',setup(b){b.onResolve({filter:/chatgpt-auth$|^cloudflare:workers$/},()=>({path:statePath,external:true}));b.onResolve({filter:/^server-only$/},()=>({path:'empty',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:'export {};'}));}}]});
+ const output=await build({entryPoints:[join(root,'app/api/rewrite/route.ts')],bundle:true,write:false,format:'esm',platform:'node',target:'es2022',plugins:[admissionFixturePlugin(root),{name:'isolated-boundaries',setup(b){b.onResolve({filter:/chatgpt-auth$|^cloudflare:workers$/},()=>({path:statePath,external:true}));b.onResolve({filter:/^server-only$/},()=>({path:'empty',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:'export {};'}));}}]});
  const routePath=join(temp,`route-${sequence}.mjs`);writeFileSync(routePath,output.outputFiles[0].text);const route=await import(pathToFileURL(routePath)),{state}=await import(pathToFileURL(statePath));
  const calls=[];let responder=success;globalThis.fetch=async(...args)=>{calls.push(args);return responder(...args);};return{...route,state,calls,respondWith(value){responder=value;}};
 }

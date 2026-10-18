@@ -17,7 +17,7 @@ const result=await build({stdin:{contents:source+'\nexport {state,reset,renderAg
 const fixture=join(temporary,'fixture.mjs');writeFileSync(fixture,result.outputFiles[0].text);const app=await import(pathToFileURL(fixture));
 function find(node,pred){if(!node)return null;if(Array.isArray(node)){for(const n of node){const r=find(n,pred);if(r)return r;}return null;}if(typeof node==='object'){if(pred(node))return node;return find(node.props?.children,pred);}return null;}
 const text='Please review the document before the meeting.',dummyKey='gsk_DUMMY_SECURITY_CLIENT_NOT_A_REAL_KEY';
-const initial=(extra={})=>({text,mode:'ai',apiKey:dummyKey,keyConsent:true,...extra});
+const initial=(extra={})=>({text,mode:'ai',apiKey:dummyKey,keyConsent:true,diagnosticPreferenceReady:true,diagnosticConsent:false,...extra});
 const originalFetch=globalThis.fetch,originalWindow=globalThis.window;
 after(()=>{globalThis.fetch=originalFetch;if(originalWindow===undefined)delete globalThis.window;else globalThis.window=originalWindow;});
 const primary=tree=>find(tree,n=>n.type==='button'&&n.props.className==='primary-button');
@@ -38,4 +38,12 @@ test('provider text and user source render as escaped text, never executable HTM
  const payload='<img src=x onerror="fixtureAttack()">',source=text;
  globalThis.fetch=async()=>Response.json(success({style:{label:payload,features:[payload],explanation:payload},notes:[payload]}));app.reset(initial());await primary(app.default()).props.onClick();app.renderAgain();const html=renderToStaticMarkup(app.default());assert(!html.includes(payload));assert(html.includes('&lt;img'));
  app.reset(initial({text:payload+' please review this text',mode:'preset'}));const rawHtml=renderToStaticMarkup(app.default());assert(!rawHtml.includes(payload));assert(rawHtml.includes('&lt;img'));assert.equal(source,text);
+});
+
+test('explicit key clear wipes the DOM and state and revokes send consent',()=>{
+ const {tree,field,cleanups}=mount();const clear=find(tree,n=>n.type==='button'&&n.props.children==='キーを消去');assert(clear);clear.props.onClick();assert.equal(app.state.apiKey,'');assert.equal(app.state.keyConsent,false);assert.equal(field.props.ref.current.value,'');for(const cleanup of cleanups)cleanup();
+});
+test('key-handling disclosure is initially closed and matches transmission and persistence boundaries',()=>{
+ let calls=0;globalThis.fetch=async()=>{calls++;throw Error('unexpected')};app.reset(initial());const tree=app.default();const details=find(tree,n=>n.type==='details'&&n.props.className==='key-handling');assert(details);assert(!details.props.open);const html=renderToStaticMarkup(details);assert(html.includes('ブラウザ → このサイトの中継サーバー → Groq'));assert(html.includes('隠す仕組みではありません'));assert(html.includes('永続保存領域'));assert(html.includes('APIキー欄の値を付け加えることはありません'));assert(html.includes('href="/privacy#api-key"'));assert(!html.includes(dummyKey));assert.equal(calls,0);
+ const input=find(tree,n=>n.props?.id==='api-key');input.props.onChange({target:{value:'gsk_fixture_paste_not_real'}});const consent=find(tree,n=>n.type==='input'&&n.props.type==='checkbox'&&n.props.checked===true);consent.props.onChange({target:{checked:true}});assert.equal(calls,0);
 });

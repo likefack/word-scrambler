@@ -1,0 +1,14 @@
+import test,{after} from 'node:test';
+import assert from 'node:assert/strict';
+import {build} from 'esbuild';
+import {mkdtempSync,writeFileSync,rmSync,readFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
+import {pathToFileURL} from 'node:url';
+const temp=mkdtempSync(join(tmpdir(),'diagnostic-pref-'));after(()=>rmSync(temp,{recursive:true,force:true}));
+const file=join(temp,'preference.mjs');const b=await build({entryPoints:[new URL('../lib/diagnostic-preference.ts',import.meta.url).pathname],bundle:true,platform:'node',format:'esm',write:false});writeFileSync(file,b.outputFiles[0].text);const m=await import(pathToFileURL(file));
+const store=value=>({getItem:key=>{assert.equal(key,m.DIAGNOSTIC_PREFERENCE_KEY);return value;},setItem(){throw Error('unexpected read-path write')}});
+test('unset setting defaults ON and explicit OFF or ON is restored without rewriting it',()=>{for(const [value,enabled] of [[null,true],['off',false],['on',true]])assert.deepEqual(m.readDiagnosticPreference(()=>store(value)),{enabled,status:'ready'});});
+test('invalid and inaccessible stored choices fail OFF rather than overriding a possible opt-out',()=>{for(const v of ['','true','false','gsk_SYNTHETIC_NOT_REAL',undefined,0])assert.deepEqual(m.readDiagnosticPreference(()=>store(v)),{enabled:false,status:'invalid'});assert.deepEqual(m.readDiagnosticPreference(()=>{throw Error('blocked')}),{enabled:false,status:'unavailable'});});
+test('only an explicit boolean writes one fixed on/off key; no source/key/result parameter exists',()=>{const writes=[];const s={getItem(){throw Error('unexpected')},setItem:(...args)=>writes.push(args)};assert.equal(m.saveDiagnosticPreference(()=>s,false),true);assert.equal(m.saveDiagnosticPreference(()=>s,true),true);for(const bad of ['off','gsk_SYNTHETIC_NOT_REAL',null,{},1])assert.equal(m.saveDiagnosticPreference(()=>s,bad),false);assert.deepEqual(writes,[[m.DIAGNOSTIC_PREFERENCE_KEY,'off'],[m.DIAGNOSTIC_PREFERENCE_KEY,'on']]);assert.equal(m.saveDiagnosticPreference(()=>{throw Error('blocked')},false),false);});
+test('the source has no network calls, cookies, sessionStorage or arbitrary serialization',()=>{const source=readFileSync(new URL('../lib/diagnostic-preference.ts',import.meta.url),'utf8');assert(!/\bfetch\s*\(|sessionStorage|document\.cookie|JSON\.stringify/.test(source));});

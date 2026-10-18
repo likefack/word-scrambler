@@ -1,3 +1,4 @@
+import { admissionFixturePlugin } from './helpers/admission-fixture.mjs';
 // Actual Workerd request streams/timers; no production auth, external network, or keys.
 import test,{after} from 'node:test';
 import assert from 'node:assert/strict';
@@ -5,7 +6,7 @@ import {build} from 'esbuild';
 import {fileURLToPath} from 'node:url';
 import {Miniflare} from 'miniflare';
 const route=fileURLToPath(new URL('../app/api/rewrite/route.ts',import.meta.url));
-const built=await build({stdin:{contents:`import {POST} from ${JSON.stringify(route)};export default {fetch:POST};`,resolveDir:process.cwd(),sourcefile:'runtime-hardening-fixture.ts'},bundle:true,write:false,format:'esm',platform:'neutral',target:'es2022',external:['cloudflare:workers'],plugins:[{name:'isolated-auth-only',setup(b){b.onResolve({filter:/chatgpt-auth$/},()=>({path:'auth',namespace:'fixture'}));b.onResolve({filter:/^server-only$/},()=>({path:'server-only',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},({path})=>({contents:path==='auth'?'export async function getChatGPTUser(){return {userId:"isolated-runtime-user"};}':'export {};',loader:'js'}));}}]});
+const built=await build({stdin:{contents:`import {POST} from ${JSON.stringify(route)};export default {fetch:POST};`,resolveDir:process.cwd(),sourcefile:'runtime-hardening-fixture.ts'},bundle:true,write:false,format:'esm',platform:'neutral',target:'es2022',external:['cloudflare:workers'],plugins:[admissionFixturePlugin(new URL('..',import.meta.url).pathname.replace(/\/$/,'')),{name:'isolated-auth-only',setup(b){b.onResolve({filter:/chatgpt-auth$/},()=>({path:'auth',namespace:'fixture'}));b.onResolve({filter:/^server-only$/},()=>({path:'server-only',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},({path})=>({contents:path==='auth'?'export async function getChatGPTUser(){return {userId:"isolated-runtime-user"};}':'export {};',loader:'js'}));}}]});
 let externalCalls=0;
 const mf=new Miniflare({modules:true,script:built.outputFiles[0].text,compatibilityDate:'2026-05-15',compatibilityFlags:['nodejs_compat'],outboundService:()=>{externalCalls++;throw Error('External network forbidden');}});
 after(()=>mf.dispose());
