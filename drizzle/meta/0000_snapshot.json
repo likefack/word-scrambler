@@ -1,0 +1,136 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "87019498-af40-465a-b275-09e527b978c1",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "error_reports": {
+      "name": "error_reports",
+      "columns": {
+        "report_id": {
+          "name": "report_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stage": {
+          "name": "stage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "http_status": {
+          "name": "http_status",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "upstream_status": {
+          "name": "upstream_status",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "server_received_at": {
+          "name": "server_received_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "error_reports_request_id_unique": {
+          "name": "error_reports_request_id_unique",
+          "columns": [
+            "request_id"
+          ],
+          "isUnique": true,
+          "where": "\"error_reports\".\"request_id\" <> 'unavailable'"
+        },
+        "error_reports_received_at_idx": {
+          "name": "error_reports_received_at_idx",
+          "columns": [
+            "server_received_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "error_reports_id_lengths": {
+          "name": "error_reports_id_lengths",
+          "value": "length(\"error_reports\".\"report_id\") = 36 AND (length(\"error_reports\".\"request_id\") = 36 OR \"error_reports\".\"request_id\" = 'unavailable')"
+        },
+        "error_reports_code_length": {
+          "name": "error_reports_code_length",
+          "value": "length(\"error_reports\".\"code\") BETWEEN 1 AND 64"
+        },
+        "error_reports_stage_length": {
+          "name": "error_reports_stage_length",
+          "value": "length(\"error_reports\".\"stage\") BETWEEN 1 AND 32"
+        },
+        "error_reports_version_length": {
+          "name": "error_reports_version_length",
+          "value": "length(\"error_reports\".\"version\") BETWEEN 1 AND 32"
+        },
+        "error_reports_date_lengths": {
+          "name": "error_reports_date_lengths",
+          "value": "length(\"error_reports\".\"timestamp\") = 24 AND length(\"error_reports\".\"server_received_at\") = 24"
+        },
+        "error_reports_http_status_bounds": {
+          "name": "error_reports_http_status_bounds",
+          "value": "\"error_reports\".\"http_status\" = 0 OR \"error_reports\".\"http_status\" BETWEEN 100 AND 599"
+        },
+        "error_reports_upstream_status_bounds": {
+          "name": "error_reports_upstream_status_bounds",
+          "value": "\"error_reports\".\"upstream_status\" IS NULL OR \"error_reports\".\"upstream_status\" BETWEEN 100 AND 599"
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
